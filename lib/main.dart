@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Login',
-      home: GroupInfoPage(groupNo: 1),//LoginPage(),
+      home: GroupInfoPage(groupNo: 3),//LoginPage(),
     );
   }
 }
