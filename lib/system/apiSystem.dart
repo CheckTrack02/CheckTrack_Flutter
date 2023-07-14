@@ -60,8 +60,3 @@ class GroupAPISystem{
 
 
 
-<<<<<<< HEAD
-  return response.statusCode;
-}
-=======
->>>>>>> 891a3ca7debb453444dcd54bb36a6e2c3e80cd3c
