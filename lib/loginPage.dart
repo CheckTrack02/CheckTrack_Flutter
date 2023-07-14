@@ -14,7 +14,7 @@ class _LoginPageState extends State<LoginPage> {
   TextEditingController controller2 = TextEditingController();
 
   void onLoginPressed() async{
-    int statusCode = await fetchUser(controller.text, controller2.text);
+    int statusCode = await UserAPISystem.fetchUser(controller.text, controller2.text);
     print(statusCode);
     if (statusCode == 200) {
         Navigator.push(
