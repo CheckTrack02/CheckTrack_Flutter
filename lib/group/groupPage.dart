@@ -10,45 +10,22 @@ class _GroupPageState extends State<GroupPage> {
 
   @override
   Widget build(BuildContext context) {
-    List<String> books = ['assets/images/literature.png', 'assets/images/literature.png', 'assets/images/literature.png', 'assets/images/literature.png', 'assets/images/literature.png'];
+    List<String> books = ['assets/images/book1.jpg', 'assets/images/book2.jpg', 'assets/images/book3.jpg', 'assets/images/book4.jpg'];
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        backgroundColor: Colors.white,
+        backgroundColor: colorScheme.color6,
         title: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          mainAxisSize: MainAxisSize.max,
           children: [
-            Icon(
-              Icons.search,
-              color: Colors.black12,
-            ),
-            Flexible(
-              flex: 1,
-              child: TextField(
-                decoration: InputDecoration(
-                  contentPadding: EdgeInsets.symmetric(
-                    vertical: 8,
-                    horizontal: 16,
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(8),
-                    ),
-                  ),
-                  hintText: '검색 키워드를 입력해주세요',
-                ),
-              ),
-            ),
-            SizedBox(
-              width: 8,
-            ),
-            IconButton(
-              onPressed: () {},
-              icon: Icon(Icons.search),
+            Icon(Icons.people,),
+            SizedBox(width: 15,),
+            Text(
+              "Reading Group", 
+              style: TextStyle(color: Colors.white)
             ),
           ],
-        ),
+        )
+        
       ),
       body: makeGrid(books),
       );
@@ -56,7 +33,7 @@ class _GroupPageState extends State<GroupPage> {
 }
 
 Column makeGrid(List<String> books){
-  List<Widget> grid_books = [];
+  List<Widget> gridBooks = [];
 
   for (int i = 0; i < books.length; i += 3){
     List<Widget> row = [];
@@ -65,14 +42,23 @@ Column makeGrid(List<String> books){
         row.add(SizedBox(width: 100,));
       }
       else{
-        row.add(Image(
-          image: AssetImage(books[j]),
-          width: 100,
-          height: 120,
+        row.add(Column(
+          children: [
+            Image(
+              image: AssetImage(books[j]),
+              width: 100,
+              height: 120,
+            ),
+            SizedBox(height: 15, ),
+            Text("group",
+              style: TextStyle(),
+            ),
+          ]
+          
         ));
       }
     }
-    grid_books.add(
+    gridBooks.add(
       Padding(
         padding: const EdgeInsets.only(top: 50),
         child: Row(
@@ -84,6 +70,6 @@ Column makeGrid(List<String> books){
   }
 
   return Column(
-    children: grid_books,
+    children: gridBooks,
     );
 }
