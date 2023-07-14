@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:checktrack/utilsSystem.dart';
+import 'package:checktrack/system/utilsSystem.dart';
+import 'package:checktrack/system/apiSystem.dart';
+import 'package:checktrack/groupPage.dart';
 
 
 class LoginPage extends StatefulWidget {
@@ -10,6 +12,24 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   TextEditingController controller = TextEditingController();
   TextEditingController controller2 = TextEditingController();
+
+  void onLoginPressed() async{
+    int statusCode = await fetchUser(controller.text, controller2.text);
+    print(statusCode);
+    if (statusCode == 200) {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (BuildContext context) =>
+                    GroupPage()));
+      }
+    else if (statusCode == 401) {
+      showSnackBar(context, Text('Wrong identifier'));
+    }
+    else {
+      showSnackBar(context, Text('Check your info again'));
+    }     
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -64,19 +84,7 @@ class _LoginPageState extends State<LoginPage> {
                           height: 50.0,
                           child: ElevatedButton( 
                               onPressed: (){
-                                if (controller.text == 'a' && controller2.text == 'a') {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (BuildContext context) =>
-                                                NextPage()));
-                                  }
-                                else if (controller.text != 'a' || controller2.text != 'a') {
-                                  showSnackBar(context, Text('Wrong identifier'));
-                                }
-                                else {
-                                  showSnackBar(context, Text('Check your info again'));
-                                }      
+                                 onLoginPressed();
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: colorScheme.color6,
@@ -107,7 +115,7 @@ class _LoginPageState extends State<LoginPage> {
 void showSnackBar(BuildContext context, Text text) {
   final snackBar = SnackBar(
     content: text,
-    backgroundColor: Color.fromARGB(255, 112, 48, 48),
+    backgroundColor: colorScheme.color3,
   );
 
 // Find the ScaffoldMessenger in the widget tree
