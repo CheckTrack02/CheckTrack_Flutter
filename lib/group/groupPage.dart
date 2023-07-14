@@ -13,11 +13,16 @@ class _GroupPageState extends State<GroupPage> {
     List<String> books = ['assets/images/literature.png', 'assets/images/literature.png', 'assets/images/literature.png', 'assets/images/literature.png', 'assets/images/literature.png'];
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: Colors.white,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           mainAxisSize: MainAxisSize.max,
           children: [
+            Icon(
+              Icons.search,
+              color: Colors.black12,
+            ),
             Flexible(
               flex: 1,
               child: TextField(
@@ -31,7 +36,7 @@ class _GroupPageState extends State<GroupPage> {
                       Radius.circular(8),
                     ),
                   ),
-                  hintText: '도서명을 입력해주세요',
+                  hintText: '검색 키워드를 입력해주세요',
                 ),
               ),
             ),
@@ -45,10 +50,7 @@ class _GroupPageState extends State<GroupPage> {
           ],
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.only(top: 50),
-        child: makeGrid(books),
-        ),
+      body: makeGrid(books),
       );
   }
 }
