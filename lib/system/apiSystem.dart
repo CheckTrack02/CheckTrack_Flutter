@@ -38,12 +38,12 @@ class APISystem{
 }
 
 class UserAPISystem{
-  static Future<int> fetchUser(String user_id, String user_pw) async {
+  static Future<int> fetchUser(String userId, String userPw) async {
     final response = await APISystem.getResponse("/login", "POST", {
-      "user_id": user_id,
-      "user_pw": user_pw
+      "userId": userId,
+      "userPw": userPw
     });
-    return response;
+    return response.statusCode;
   }
   static Future<UserEntity> getUserEntity(int userNo) async{
     final response = await APISystem.getResponse("/user/get-user-entity?userNo=${userNo}", "GET", null);
