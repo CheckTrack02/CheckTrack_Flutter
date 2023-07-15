@@ -21,7 +21,7 @@ class _LoginPageState extends State<LoginPage> {
             context,
             MaterialPageRoute(
                 builder: (BuildContext context) =>
-                    GroupPage()));
+                    GroupPage(userNo: 1)));
       }
     else if (statusCode == 401) {
       showSnackBar(context, Text('Wrong identifier'));

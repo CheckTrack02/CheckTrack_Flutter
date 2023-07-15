@@ -6,6 +6,7 @@ import 'package:checktrack/db/UserEntity.dart';
 import 'package:checktrack/db/GroupUserEntity.dart';
 import 'package:checktrack/db/BookEntity.dart';
 import 'package:checktrack/db/IssueEntity.dart';
+import 'package:checktrack/db/CommentEntity.dart';
 
 const int PORT_NO = 80;
 const String httpUrl = "http://172.10.5.144:${PORT_NO}";
@@ -42,7 +43,7 @@ class UserAPISystem{
       "user_id": user_id,
       "user_pw": user_pw
     });
-    return response.statusCode;
+    return response;
   }
   static Future<UserEntity> getUserEntity(int userNo) async{
     final response = await APISystem.getResponse("/user/get-user-entity?userNo=${userNo}", "GET", null);
@@ -126,6 +127,7 @@ class IssueAPISystem{
       issueGroupNo: jsonDecode(response.body)['issueGroupNo'],
     );
   }
+  
   static Future<List<IssueEntity>> getGroupIssueList (int groupNo) async{
     final response = await APISystem.getResponse("/issue/get-group-issue-list?groupNo=${groupNo}", "GET", null);
     List<IssueEntity> issueList = [];
@@ -141,6 +143,25 @@ class IssueAPISystem{
       ));
     }
     return issueList;
+  }
+}
+
+class CommentAPISystem{
+    static Future<List<CommentEntity>> getCommentList (int issueNo) async{
+    final response = await APISystem.getResponse("/issue/get-group-issue-comment-list?groupNo=${issueNo}", "GET", null);
+    List<CommentEntity> commentList = [];
+    List<dynamic> res = jsonDecode(response.body);
+    for(int i=0; i<res.length; i++){
+      commentList.add(CommentEntity(
+        commentNo: res[i]['commentNo'],
+        commentIssueNo: res[i]['commentIssueNo'],
+        commentText: res[i]['commentText'],
+        commentUserNo: res[i]['commentUserNo'],
+        commentDate: DateTime.parse(res[i]['commentDate']),
+        commentGroupNo: res[i]['commentGroupNo'],
+      ));
+    }
+    return commentList;
   }
 }
 
