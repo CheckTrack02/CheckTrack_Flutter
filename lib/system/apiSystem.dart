@@ -38,12 +38,12 @@ class APISystem{
 }
 
 class UserAPISystem{
-  static Future<int> fetchUser(String user_id, String user_pw) async {
+  static Future<int> fetchUser(String userId, String userPw) async {
     final response = await APISystem.getResponse("/login", "POST", {
-      "user_id": user_id,
-      "user_pw": user_pw
+      "userId": userId,
+      "userPw": userPw
     });
-    return response;
+    return response.statusCode;
   }
   static Future<UserEntity> getUserEntity(int userNo) async{
     final response = await APISystem.getResponse("/user/get-user-entity?userNo=${userNo}", "GET", null);
@@ -90,11 +90,13 @@ class GroupAPISystem{
   }
 
   static Future<List<GroupEntity>> getUserGroupList (int userNo) async{
-    final response = await APISystem.getResponse("/group/get-user-group-no-list?groupNo=${userNo}", "GET", null);
+    print("grouplist");
+    final response = await APISystem.getResponse("/group/get-user-group-no-list?userNo=${userNo}", "GET", null);
     List<GroupEntity> groupList = [];
     List<dynamic> groupNoList = jsonDecode(response.body);
     for(int i = 0; i < groupNoList.length; i++){
       int groupNo = groupNoList[i]['groupNo'];
+      print(groupNo);
       groupList.add(await GroupAPISystem.getGroupEntity(groupNo));
     }
     return groupList;
@@ -125,6 +127,7 @@ class IssueAPISystem{
       issueUserNo: jsonDecode(response.body)['issueUserNo'],
       issueDate: DateTime.parse(jsonDecode(response.body)['issueDate']),
       issueGroupNo: jsonDecode(response.body)['issueGroupNo'],
+      issueCommentNum: jsonDecode(response.body)['issueCommentNum'],
     );
   }
   
@@ -140,6 +143,7 @@ class IssueAPISystem{
         issueUserNo: res[i]['issueUserNo'],
         issueDate: DateTime.parse(res[i]['issueDate']),
         issueGroupNo: res[i]['issueGroupNo'],
+        issueCommentNum: res[i]['issueCommentNum'],
       ));
     }
     return issueList;
@@ -147,8 +151,8 @@ class IssueAPISystem{
 }
 
 class CommentAPISystem{
-    static Future<List<CommentEntity>> getCommentList (int issueNo) async{
-    final response = await APISystem.getResponse("/issue/get-group-issue-comment-list?groupNo=${issueNo}", "GET", null);
+    static Future<List<CommentEntity>> getIssueCommentList (int issueNo) async{
+    final response = await APISystem.getResponse("/comment/get-group-issue-comment-list?issueNo=${issueNo}", "GET", null);
     List<CommentEntity> commentList = [];
     List<dynamic> res = jsonDecode(response.body);
     for(int i=0; i<res.length; i++){
@@ -158,7 +162,6 @@ class CommentAPISystem{
         commentText: res[i]['commentText'],
         commentUserNo: res[i]['commentUserNo'],
         commentDate: DateTime.parse(res[i]['commentDate']),
-        commentGroupNo: res[i]['commentGroupNo'],
       ));
     }
     return commentList;

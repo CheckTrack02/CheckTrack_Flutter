@@ -37,7 +37,7 @@ class _LoginPageState extends State<LoginPage> {
       appBar: AppBar(
         title: Text('Log in'),
         elevation: 0.0,
-        backgroundColor: colorScheme.color6,
+        backgroundColor: colorScheme.color4,
         centerTitle: true,
       ),
       body: GestureDetector(     
@@ -58,7 +58,7 @@ class _LoginPageState extends State<LoginPage> {
               child: Theme(
                 data: ThemeData(
                   primaryColor: colorScheme.color4,
-                  inputDecorationTheme: InputDecorationTheme(labelStyle: TextStyle(color: colorScheme.color5, fontSize: 15.0))
+                  inputDecorationTheme: InputDecorationTheme(labelStyle: TextStyle(color: colorScheme.color4, fontSize: 15.0))
                 ),
                 child: Container(
                   padding: EdgeInsets.all(20),
@@ -87,13 +87,13 @@ class _LoginPageState extends State<LoginPage> {
                                  onLoginPressed();
                               },
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: colorScheme.color6,
+                                backgroundColor: colorScheme.color4,
                               ),
                               child: Text(
                                 'Login',
                                 style: TextStyle(
                                   fontSize: 16.0, 
-                                  color: colorScheme.color1,
+                                  color: Colors.white,
                                   ),
                               ),
                           )
