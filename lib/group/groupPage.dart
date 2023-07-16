@@ -22,7 +22,6 @@ class _GroupPageState extends State<GroupPage> {
   Future<bool> loadGroupList() async {
     groupList = await GroupAPISystem.getUserGroupList(userNo);
     for (GroupEntity item in groupList) {
-      print(item.groupNo);
       final response = await BookAPISystem.getBookEntity(item.groupBookNo);
       bookImageList.add(response.bookImage);
     }
@@ -36,11 +35,11 @@ class _GroupPageState extends State<GroupPage> {
       bool isFinished = await loadGroupList();
       List<Widget> gridBooks = [];
 
-      void onGroupPressed(mGroupNo) async {
+      void onGroupPressed(mGroup) async {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (BuildContext context) => GroupInfoPage(groupNo: mGroupNo)));
+            builder: (BuildContext context) => GroupInfoPage(groupEntity: mGroup)));
       }
 
       for (int i = 0; i < groupList.length; i += 3) {
@@ -55,7 +54,7 @@ class _GroupPageState extends State<GroupPage> {
             row.add(Column(children: [
               GestureDetector(
                   onTap: () {
-                    onGroupPressed(3);
+                    onGroupPressed(groupList[j]);
                   },
                   child: Image(
                     image: NetworkImage(bookImageList[j]),

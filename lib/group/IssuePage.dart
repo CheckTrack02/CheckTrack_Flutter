@@ -57,7 +57,7 @@ class _IssuePageState extends State<IssuePage> {
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.grey.withOpacity(0.2),
+                    color: Colors.grey.withOpacity(0.1),
                     spreadRadius: 3,
                     blurRadius: 7,
                     offset: Offset(0, 3),
@@ -159,6 +159,23 @@ class _IssuePageState extends State<IssuePage> {
               }
             )
           ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Text("독서 내용 공유하기",
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: colorScheme.color3,
+                ),
+              ),
+              IconButton(onPressed: (){
+                },
+               icon: Icon(Icons.send),
+              ),
+              SizedBox(width: 10,),
+            ],
+          )
         ],
       ),
     );
