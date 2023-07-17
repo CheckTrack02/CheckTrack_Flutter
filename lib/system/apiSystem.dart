@@ -7,11 +7,31 @@ import 'package:checktrack/db/GroupUserEntity.dart';
 import 'package:checktrack/db/BookEntity.dart';
 import 'package:checktrack/db/IssueEntity.dart';
 import 'package:checktrack/db/CommentEntity.dart';
+import 'package:checktrack/db/UserBookEntity.dart';
 
 const int PORT_NO = 80;
 const String httpUrl = "http://172.10.5.144:${PORT_NO}";
 
 class APISystem{
+  static UserEntity myUserEntity = UserEntity(userNo: 0, userId: "", userPw: "", userName: "");
+  static void setUserEntity(UserEntity userEntity){
+    myUserEntity = userEntity;
+  }
+  static UserEntity getUserEntity(){
+    return myUserEntity;
+  }
+
+  static Future<UserEntity> initUserEntity() async{
+    // TEST
+    UserEntity userEntity = await UserAPISystem.getUserEntity(1);
+    setUserEntity(userEntity);
+    return userEntity;
+  }
+
+  APISystem() {
+    //initUserEntity();
+  }
+
   static Future<dynamic> getResponse(String httpPath, String queryType, data) async{
     final String url = httpUrl + httpPath;
     if(queryType == "GET"){
@@ -44,6 +64,16 @@ class UserAPISystem{
       "user_pw": user_pw
     });
     return response;
+  }
+  static Future<UserEntity> getNameUserEntity(String userName) async{
+    final response = await APISystem.getResponse("/user/get-name-user-entity?userName=${userName}", "GET", null);
+    //print(response.body);
+    return UserEntity(
+      userNo: jsonDecode(response.body)['userNo'], 
+      userId: jsonDecode(response.body)['userId'], 
+      userName: jsonDecode(response.body)['userName'], 
+      userPw: jsonDecode(response.body)['userPw']
+    );
   }
   static Future<UserEntity> getUserEntity(int userNo) async{
     final response = await APISystem.getResponse("/user/get-user-entity?userNo=${userNo}", "GET", null);
@@ -113,6 +143,29 @@ class BookAPISystem{
       bookPageNum: jsonDecode(response.body)['bookPageNum'],
     );
   }
+
+  static Future<List<BookEntity>> getReadingBookList(int userNo) async{
+    print("GET BOOK LIST");
+    final response = await APISystem.getResponse("/book/get-reading-book-no-list?userNo=${userNo}", "GET", null);
+    List<BookEntity> bookList = [];
+    List<dynamic> bookNoList = jsonDecode(response.body);
+    for(int i=0; i<bookNoList.length; i++){
+      int bookNo = bookNoList[i]['bookNo'];
+      bookList.add(await BookAPISystem.getBookEntity(bookNo));
+    }
+    return bookList;
+  }
+
+  static Future<List<BookEntity>> getWillReadBookList(int userNo) async{
+    final response = await APISystem.getResponse("/book/get-will-read-book-no-list?userNo=${userNo}", "GET", null);
+    List<BookEntity> bookList = [];
+    List<dynamic> bookNoList = jsonDecode(response.body);
+    for(int i=0; i<bookNoList.length; i++){
+      int bookNo = bookNoList[i]['bookNo'];
+      bookList.add(await BookAPISystem.getBookEntity(bookNo));
+    }
+    return bookList;
+  }
 }
 
 class IssueAPISystem{
@@ -165,4 +218,27 @@ class CommentAPISystem{
   }
 }
 
+class UserBookAPISystem{
+  static Future<UserBookEntity> getUserBookEntity(int userNo, int bookNo) async{
+    final response = await APISystem.getResponse("/user-book/get-user-book-entity?userNo=${userNo}&bookNo=${bookNo}", "GET", null);
+    print(response.body);
+    return UserBookEntity(
+      userNo: jsonDecode(response.body)['userNo'],
+      bookNo: jsonDecode(response.body)['bookNo'],
+      userPage: jsonDecode(response.body)['userPage'],
+      userTime: jsonDecode(response.body)['userTime'],
+      bookType: jsonDecode(response.body)['bookType'],  
+    );
+  }
+  static void updateUserBookEntity(int userNo, int bookNo, int userTime, int userPage, String bookType) async{
+      final response = await APISystem.getResponse("/user-book/update-user-book-entity", "POST", {
+      "userNo": userNo,
+      "bookNo": bookNo,
+      "userTime": userTime,
+      "userPage": userPage,
+      "bookType": bookType,
+      });
+      return;
+  }
+}
 
