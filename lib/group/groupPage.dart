@@ -7,7 +7,8 @@ import 'package:checktrack/system/utilsSystem.dart';
 
 class GroupPage extends StatefulWidget {
   final int userNo;
-  GroupPage({required this.userNo});
+  final VoidCallback? onFlip;
+  GroupPage({required this.userNo, required this.onFlip});
 
   @override
   State<GroupPage> createState() => _GroupPageState(userNo);
@@ -63,7 +64,7 @@ class _GroupPageState extends State<GroupPage> {
             row.add(SizedBox(
               width: 100,
             ));
-          } 
+          }
           else {
             row.add(Column(children: [
               GestureDetector(

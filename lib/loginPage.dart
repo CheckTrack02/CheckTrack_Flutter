@@ -2,11 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:checktrack/system/utilsSystem.dart';
 import 'package:checktrack/system/apiSystem.dart';
 import 'package:checktrack/group/GroupPage.dart';
-
+import 'package:checktrack/main.dart';
 
 class LoginPage extends StatefulWidget {
-  final VoidCallback? onFlip;
-  LoginPage({required this.onFlip});
+  LoginPage();
   @override
   State<LoginPage> createState() => _LoginPageState();
 }
@@ -23,7 +22,8 @@ class _LoginPageState extends State<LoginPage> {
         context,
         MaterialPageRoute(
           builder: (BuildContext context) =>
-            GroupPage(userNo: res["userNo"])));
+            MyMain(userNo: res["userNo"])));
+            //_MyApp(userNo: res["userNo"])));
     }
     else if (res["statusCode"] == 401) {
       showSnackBar(context, Text('Wrong identifier'));

@@ -3,18 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:checktrack/loginPage.dart';
 import 'package:checktrack/group/GroupInfoPage.dart';
 import 'package:page_flip_builder/page_flip_builder.dart';
-                       
 import 'package:checktrack/group/GroupPage.dart';
 
 void main() {
-  runApp(_MyApp());
+  runApp(MyApp());
 }
 
 class MyAppState extends ChangeNotifier {
 
 }
 
-/*class MyApp extends StatelessWidget {
+class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
@@ -22,13 +21,14 @@ class MyAppState extends ChangeNotifier {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Login',
-      home: TimerStartPage(),//LoginPage(),
+      home: LoginPage(),
     );
   }
-}*/
+}
 
-class _MyApp extends StatelessWidget {
-  _MyApp({super.key});
+class MyMain extends StatelessWidget {
+  int userNo;
+  MyMain({required this.userNo});
   final pageFlipKey = GlobalKey<PageFlipBuilderState>();
   
   @override
@@ -44,7 +44,8 @@ class _MyApp extends StatelessWidget {
           frontBuilder: (_) => TimerStartPage(
             onFlip: () => pageFlipKey.currentState?.flip(),
           ),
-          backBuilder: (_) => LoginPage(
+          backBuilder: (_) => GroupPage(
+            userNo: userNo,
             onFlip: () => pageFlipKey.currentState?.flip(),
           ),
           maxTilt: 0.003,
