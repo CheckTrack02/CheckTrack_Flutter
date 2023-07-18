@@ -131,7 +131,7 @@ class _GroupPageState extends State<GroupPage> {
         }
       ),
       floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.group_add),
+        child: Icon(Icons.import_contacts),
         backgroundColor: colorScheme.color3,
         focusColor: colorScheme.color1,
         onPressed: () { onAddPressed(this.userNo); },

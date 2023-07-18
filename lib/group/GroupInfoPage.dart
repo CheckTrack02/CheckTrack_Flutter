@@ -60,35 +60,6 @@ class _GroupInfoPageState extends State<GroupInfoPage> {
           builder: (BuildContext context) => IssuePage(groupNo: mGroupNo, userNo: mUserNo, userNoNameMap: mUserMap,)));
     }
 
-    /*
-    SfLinearGauge makeDayGauge(){
-      int period = groupEntity.groupEndDate.difference(groupEntity.groupStartDate).inDays;
-      debugPrint(period.toString());
-      int toNow = DateTime.now().difference(groupEntity.groupStartDate).inDays;
-      debugPrint(toNow.toString());
-      double percent = toNow / period * 100;
-      debugPrint(percent.toString());
-      return SfLinearGauge(
-        barPointers: [ 
-          LinearBarPointer(
-            value: percent,
-            // Changed the thickness to make the curve visible
-            thickness: 10,
-            //Updated the edge style as curve at end position
-            edgeStyle: LinearEdgeStyle.endCurve,
-            shaderCallback: (bounds) => LinearGradient(
-                        begin: Alignment.centerLeft,
-                        end: Alignment.centerRight,
-                        colors: [colorScheme.color3, colorScheme.color4])
-                    .createShader(bounds)
-          )
-        ],
-        showLabels: false,          
-        showTicks: false,
-      );
-    }
-    */
-
     SfRadialGauge makeGauge(int userPage) {
       int bookPage = bookEntity.bookPageNum;
       bool isCardView = false;
@@ -146,7 +117,7 @@ class _GroupInfoPageState extends State<GroupInfoPage> {
             ]
           ),
         ],
-      );
+      ); 
     }
 
     Future<Widget> getBookDetail() async{
@@ -277,8 +248,7 @@ class _GroupInfoPageState extends State<GroupInfoPage> {
       List<Widget> widgetList = [];
       
       for(int i = 0; i < userList.length; i++){
-        Widget widget = Container(//Transform.translate(
-          //offset: Offset(-25*i.toDouble(), 0),
+        Widget widget = Container(
           child: SizedBox(
             width: 130,
             height: 130,
@@ -311,6 +281,7 @@ class _GroupInfoPageState extends State<GroupInfoPage> {
         elevation: 0.0,
         backgroundColor: colorScheme.color4,
         centerTitle: true,
+        actions: [IconButton(onPressed: (){}, icon: Icon(Icons.group_add_outlined))],
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -353,30 +324,6 @@ class _GroupInfoPageState extends State<GroupInfoPage> {
               }
             )
           ),
-          /*
-          Padding(
-            padding: const EdgeInsets.all(15.0),
-            child: FutureBuilder(
-              future: getDayGraph(),
-              builder: (BuildContext context, AsyncSnapshot snapshot){
-                if(snapshot.hasData == false || snapshot.hasError){
-                  return SizedBox(
-                    height: 50,
-                    width: 50,
-                    child: CircularProgressIndicator()
-                  );
-                }else{
-                  return Padding(
-                    padding: const EdgeInsets.only(left: 15.0, right: 15.0),
-                    child: SizedBox(
-                      height: 50,
-                      child: snapshot.data,),
-                  );
-                }
-              }
-            ),
-          ),
-          */
           Padding(
             padding: const EdgeInsets.only(top: 15.0, bottom: 10.0, left: 20.0),
             child: SizedBox(

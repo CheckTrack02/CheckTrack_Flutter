@@ -208,62 +208,87 @@ class _GroupAddPageState extends State<GroupAddPage> {
                             builder: (BuildContext context) {
                               return StatefulBuilder(
                                 builder: (BuildContext context, StateSetter setState) {
-                                  return AlertDialog(
-                                    content: SizedBox(
-                                      width: 300,
-                                      height: 250,
-                                      child: Column(
-                                        children: [
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            children: [
-                                              SizedBox(width: 20),
-                                              SizedBox(
-                                                width: 200,
-                                                height: 30,
-                                                child: TextField(
-                                                  controller: searchController,
-                                                  decoration: InputDecoration(
-                                                    hintText: '책 제목을 검색하세요',
-                                                  ),
+                                  return ClipRRect(
+                                    borderRadius: BorderRadius.circular(20),
+                                    child: Dialog( // Use Dialog instead of AlertDialog
+                                      insetPadding: EdgeInsets.symmetric(horizontal: 40), // Optional: Adjust the insetPadding to control the width of the dialog
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                      child: SizedBox(
+                                        width: 300,
+                                        height: 250,
+                                        child: Column(
+                                          children: [
+                                            SizedBox(height: 20,),
+                                            Row(
+                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              children: [
+                                                Container(
+                                                  width: 250,
+                                                  height: 40,
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.grey.withOpacity(0.3),
+                                                    borderRadius: BorderRadius.circular(20),
+                                                    ),
+                                                  child: Row(
+                                                    mainAxisAlignment: MainAxisAlignment.center,
+                                                    children: [
+                                                    SizedBox(
+                                                      width: 200,
+                                                      height: 30,
+                                                      child: TextField(
+                                                      controller: searchController,
+                                                      textAlign: TextAlign.center,
+                                                      decoration: InputDecoration(
+                                                        contentPadding: EdgeInsets.only(bottom: 12),
+                                                        hintText: '책 제목을 검색하세요',
+                                                        border: InputBorder.none,),
+                                                      ),
+                                                    ),
+                                                    IconButton(
+                                                      onPressed: () async {
+                                                        List<BookEntity> updatedBookList =
+                                                            await BookAPISystem.getSearchBookEntity(
+                                                                searchController.text);
+                                                        setState(() {
+                                                          bookList = updatedBookList;
+                                                        });
+                                                      },
+                                                      icon: Icon(Icons.search),
+                                                    ),
+                                                  ],)
                                                 ),
-                                              ),
-                                              IconButton(
-                                                onPressed: () async {
-                                                  List<BookEntity> updatedBookList =
-                                                      await BookAPISystem.getSearchBookEntity(
-                                                          searchController.text);
-                                                  setState(() {
-                                                    bookList = updatedBookList;
-                                                  });
-                                                },
-                                                icon: Icon(Icons.search),
-                                              ),
-                                            ],
-                                          ),
-                                          SizedBox(height: 10),
-                                          Expanded(
-                                            child: ListView.builder(
-                                              physics: AlwaysScrollableScrollPhysics(),
-                                              itemCount: bookList.length,
-                                              itemBuilder: (BuildContext context, int index) {
-                                                BookEntity book = bookList[index];
-                                                return ListTile(
-                                                  leading: Image.network(book.bookImage),
-                                                  title: Text(book.bookName),
-                                                  subtitle: Text(book.bookAuthor),
-                                                  onTap: (){
-                                                    setState(() {
-                                                      selectedBook = book;
-                                                      bookController.text = book.bookName;
-                                                    });
-                                                    Navigator.pop(context);
-                                                  }
-                                                );
-                                              },
+                                                
+                                              ],
                                             ),
-                                          ),
-                                        ],
+                                            SizedBox(height: 10),
+                                            Expanded(
+                                              child: ListView.builder(
+                                                physics: AlwaysScrollableScrollPhysics(),
+                                                itemCount: bookList.length,
+                                                itemBuilder: (BuildContext context, int index) {
+                                                  BookEntity book = bookList[index];
+                                                  return Padding(
+                                                    padding: const EdgeInsets.only(left: 12.0),
+                                                    child: ListTile(
+                                                      leading: Image.network(book.bookImage),
+                                                      title: Text(book.bookName),
+                                                      subtitle: Text(book.bookAuthor),
+                                                      onTap: (){
+                                                        setState(() {
+                                                          selectedBook = book;
+                                                          bookController.text = book.bookName;
+                                                        });
+                                                        Navigator.pop(context);
+                                                      }
+                                                    ),
+                                                  );
+                                                },
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   );
@@ -342,7 +367,7 @@ class _GroupAddPageState extends State<GroupAddPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Icon(Icons.group_add),
+        title: Icon(Icons.import_contacts),
         elevation: 0.0,
         backgroundColor: colorScheme.color4,
         centerTitle: true,
