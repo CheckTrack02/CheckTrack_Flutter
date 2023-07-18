@@ -6,6 +6,7 @@ class IssueEntity{
     required this.issueUserNo,
     required this.issueDate,
     required this.issueGroupNo,
+    required this.issueCommentNum,
   });
   int issueNo;
   String issueTitle;
@@ -13,4 +14,5 @@ class IssueEntity{
   int issueUserNo;
   DateTime issueDate;
   int issueGroupNo;
+  int issueCommentNum;
 }

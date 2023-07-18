@@ -1,66 +1,50 @@
 import 'package:flutter/material.dart';
+import 'package:syncfusion_flutter_gauges/gauges.dart';
+import 'package:intl/intl.dart';
+import 'package:checktrack/system/apiSystem.dart';
 import 'package:checktrack/system/utilsSystem.dart';
 import 'package:checktrack/db/GroupEntity.dart';
 import 'package:checktrack/db/UserEntity.dart';
-import 'package:checktrack/system/apiSystem.dart';
 import 'package:checktrack/db/GroupUserEntity.dart';
-import 'package:syncfusion_flutter_gauges/gauges.dart';
 import 'package:checktrack/db/BookEntity.dart';
-import 'package:checktrack/db/IssueEntity.dart';
+import 'package:checktrack/group/IssuePage.dart';
+
 
 
 class GroupInfoPage extends StatefulWidget {
-  final int groupNo;
+  final GroupEntity groupEntity;
+  final int userNo;
 
-  void getGroupEntity(){
-    
-  }
-  GroupInfoPage({required this.groupNo});
-
-
+  GroupInfoPage({ 
+    required this.groupEntity,
+    required this.userNo,
+  });
 
   @override
-  State<GroupInfoPage> createState() => _GroupInfoPageState(groupNo);
+  State<GroupInfoPage> createState() => _GroupInfoPageState(groupEntity, userNo);
 }
 
 class _GroupInfoPageState extends State<GroupInfoPage> {
-
-  _GroupInfoPageState(this.groupNo){
-    //loadGroupUser();
-  }
-
-  late GroupEntity groupEntity;
+  final GroupEntity groupEntity;
+  final int userNo;
   late BookEntity bookEntity;
-  final int groupNo;
 
   List<UserEntity> userList = [];
   List<GroupUserEntity> groupUserList = [];
-  List<IssueEntity> issueList = [];
   Map<int, String> userNoNameMap = {};
+
+  _GroupInfoPageState(this.groupEntity, this.userNo);
   
 
   Future<bool> loadGroupUser() async{
-    groupEntity = await GroupAPISystem.getGroupEntity(groupNo);
     bookEntity = await BookAPISystem.getBookEntity(groupEntity.groupBookNo);
-    //print(groupEntity);
     if(userList.isEmpty){
-      userList = await UserAPISystem.getGroupUserList(groupNo);
+      userList = await UserAPISystem.getGroupUserList(groupEntity.groupNo);
       for(int i=0; i<userList.length; i++){
         userNoNameMap[userList[i].userNo] = userList[i].userName;
       }
     }
-
-    if(issueList.isEmpty){
-      issueList = await IssueAPISystem.getGroupIssueList(groupNo);
-    }
-
     print("LOADED GROUP INFORMATION");
-    
-    // TEST
-    //for(int i=0; i<userList.length; i++){
-    //  print(userList[i].userName + " " + userList[i].userNo.toString());
-    //}
-    // TEST
     return true;
   }
 
@@ -69,20 +53,56 @@ class _GroupInfoPageState extends State<GroupInfoPage> {
   @override
   Widget build(BuildContext context) {
 
-    SfRadialGauge makeGauge(int userPage){
+    void onIssuePressed(mGroupNo, mUserMap, mUserNo) async {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (BuildContext context) => IssuePage(groupNo: mGroupNo, userNo: mUserNo, userNoNameMap: mUserMap,)));
+    }
+
+    /*
+    SfLinearGauge makeDayGauge(){
+      int period = groupEntity.groupEndDate.difference(groupEntity.groupStartDate).inDays;
+      debugPrint(period.toString());
+      int toNow = DateTime.now().difference(groupEntity.groupStartDate).inDays;
+      debugPrint(toNow.toString());
+      double percent = toNow / period * 100;
+      debugPrint(percent.toString());
+      return SfLinearGauge(
+        barPointers: [ 
+          LinearBarPointer(
+            value: percent,
+            // Changed the thickness to make the curve visible
+            thickness: 10,
+            //Updated the edge style as curve at end position
+            edgeStyle: LinearEdgeStyle.endCurve,
+            shaderCallback: (bounds) => LinearGradient(
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                        colors: [colorScheme.color3, colorScheme.color4])
+                    .createShader(bounds)
+          )
+        ],
+        showLabels: false,          
+        showTicks: false,
+      );
+    }
+    */
+
+    SfRadialGauge makeGauge(int userPage) {
       int bookPage = bookEntity.bookPageNum;
       bool isCardView = false;
       double _markerValue = 100.0;
       return SfRadialGauge(
-      enableLoadingAnimation: true,
-      axes: <RadialAxis>[
-        RadialAxis(
+        enableLoadingAnimation: true,
+        axes: <RadialAxis>[
+          RadialAxis(
             showLabels: false,
             showTicks: false,
             radiusFactor: 1,
             maximum: bookPage.toDouble(),
             axisLineStyle: const AxisLineStyle(
-                cornerStyle: CornerStyle.startCurve, thickness: 5),
+              cornerStyle: CornerStyle.startCurve, thickness: 5),
             annotations: <GaugeAnnotation>[
               GaugeAnnotation(
                   angle: 90,
@@ -99,35 +119,17 @@ class _GroupInfoPageState extends State<GroupInfoPage> {
                         child: Text(
                           'pages',
                           style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontStyle: FontStyle.italic,
-                              fontSize: 9),
+                            fontWeight: FontWeight.bold,
+                            fontStyle: FontStyle.italic,
+                            fontSize: 9),
                         ),
                       )
                     ],
                   )),
-              /*GaugeAnnotation(
-                angle: 124,
-                positionFactor: 1.1,
-                widget:
-                    Padding(
-                      padding: const EdgeInsets.only(top: 5.0),
-                      child: Text('0', style: TextStyle(fontSize: 8)),
-                    ),
-              ),
-              GaugeAnnotation(
-                angle: 54,
-                positionFactor: 1.1,
-                widget: Padding(
-                  padding: const EdgeInsets.only(top: 5.0),
-                  child: Text(bookPage.toString(),
-                      style: TextStyle(fontSize: 8)),
-                ),
-              ),*/
             ],
             pointers: <GaugePointer>[
               RangePointer(
-                value: userPage.toDouble()+12,
+                value: userPage.toDouble() + 5,
                 width: 5,
                 pointerOffset: 0,
                 cornerStyle: CornerStyle.bothCurve,
@@ -138,37 +140,152 @@ class _GroupInfoPageState extends State<GroupInfoPage> {
               ),
               MarkerPointer(
                 value: userPage.toDouble(),
-                color: Colors.brown,
+                color: colorScheme.color1,
                 markerType: MarkerType.circle,
               ),
-            ]),
-      ],
-    ); 
+            ]
+          ),
+        ],
+      );
     }
 
+    Future<Widget> getBookDetail() async{
+      bool isFinished = await loadGroupUser();
+      Widget bookWidget = Padding(
+        padding: const EdgeInsets.all(15.0),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(20),
+          child: Container(
+            width: 180,
+            height: 270,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.1),
+                  spreadRadius: 3,
+                  blurRadius: 7,
+                  offset: Offset(0, 3),
+                )
+              ],
+            ),
+            child: Image(
+              image: NetworkImage(bookEntity.bookImage),
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
+      );
+      return bookWidget;
+    }
+
+    Future<Widget> getGroupDetail() async {
+      bool isFinished = await loadGroupUser();
+      int toNow = DateTime.now().difference(groupEntity.groupStartDate).inDays + 1;
+      List<Text> memberList = [];
+      memberList.add(Text(
+                      userList[0].userName,
+                      style: TextStyle(
+                      fontSize: 16.0,
+                      ),
+                    ));
+      for(int i = 1; i < userList.length; i++){
+        memberList.add(Text(", "+userList[i].userName,
+                      style: TextStyle(
+                      fontSize: 16.0,
+                      )
+                    ));
+      }
+
+      Widget groupWidget = Padding(
+        padding: const EdgeInsets.all(20.0),
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.1),
+                  spreadRadius: 3,
+                  blurRadius: 7,
+                  offset: Offset(0, 3),
+                )
+              ]
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(height: 10,),
+                  Text(
+                    "독서 시작일",
+                    style: TextStyle(
+                      fontSize: 17.0,
+                      fontWeight: FontWeight.bold,
+                    )
+                  ),
+                  SizedBox(height: 10,),
+                  Row(children: [
+                    Text(
+                    DateFormat('yyyy년 M월 d일').format(groupEntity.groupStartDate),
+                    style: TextStyle(
+                      fontSize: 16.0,
+                    )),
+                    SizedBox(width: 5,),
+                    Text(
+                    "("+toNow.toString()+"일째)",
+                    style: TextStyle(
+                      fontSize: 16.0,
+                      color: colorScheme.color3,
+                    )),
+                  ],
+                  ),
+                  SizedBox(height: 20,),
+                  Text(
+                    "독서 모임 구성원",
+                    style: TextStyle(
+                      fontSize: 17.0,
+                      fontWeight: FontWeight.bold,
+                    )
+                  ),
+                  SizedBox(height: 10,),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: memberList,
+                    ),
+                  ),
+                  SizedBox(height: 10,),
+                ],
+              ),
+            ),
+          ),
+        );
+        return groupWidget;
+    }
 
     Future<List<Widget>> getUserList() async{
       bool isFinished = await loadGroupUser();
       
-      
-      for(int i=groupUserList.length; i<userList.length; i++){
+      for(int i = groupUserList.length; i < userList.length; i++){
         int userNo = userList[i].userNo;
         print("GROUP NO : " + userNo.toString());
-        GroupUserEntity groupUserEntity = await UserAPISystem.getGroupUserEntity(userNo, groupNo);
+        GroupUserEntity groupUserEntity = await UserAPISystem.getGroupUserEntity(userNo, groupEntity.groupNo);
         groupUserList.add(groupUserEntity);
       }
       List<Widget> widgetList = [];
       
-      for(int i=0; i<userList.length; i++){
+      for(int i = 0; i < userList.length; i++){
         Widget widget = Container(//Transform.translate(
           //offset: Offset(-25*i.toDouble(), 0),
           child: SizedBox(
-            width: 120,
-            height: 120,
+            width: 130,
+            height: 130,
             child: Column(
               children :[
                 SizedBox(
-                  height: 100,
+                  height: 110,
                   width: 100,
                   child: makeGauge(groupUserList[i].userPage),
                 ),
@@ -176,7 +293,7 @@ class _GroupInfoPageState extends State<GroupInfoPage> {
                   userList[i].userName,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontSize: 10.0)
+                  style: TextStyle(fontSize: 14.0)
                 ),
               ]  
             ),
@@ -185,70 +302,97 @@ class _GroupInfoPageState extends State<GroupInfoPage> {
         widgetList.add(widget);
       }
 
-
-      return widgetList;
-    }
-
-    Future<List<Widget>> getIssueList() async{
-      bool isFinished = await loadGroupUser();
-      List<Widget> widgetList = [];
-      for(int i=0; i<issueList.length; i++){
-        Widget widget = SizedBox(
-          child: Row(
-            children: [
-              Column(
-                children:[
-                  Text(
-                    issueList[i].issueTitle,
-                    style: TextStyle(
-                      fontSize: 30.0,
-                    )
-                  ),
-                  Text(
-                    userNoNameMap[issueList[i].issueUserNo]!,
-                    style: TextStyle(
-                      fontSize: 10.0,
-                    )
-                  ),
-                ]
-              ),
-              Text(
-                issueList[i].issueDate.toString(),
-                style: TextStyle(
-                  fontSize: 20.0,
-                )
-              ),
-            ],
-          ),
-        );
-        widgetList.add(widget);
-      }
       return widgetList;
     }
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Book Club'),
+        title: Text("READING JOURNAL", style: TextStyle(color: Colors.white)),
         elevation: 0.0,
-        backgroundColor: colorScheme.color6,
+        backgroundColor: colorScheme.color4,
         centerTitle: true,
       ),
       body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Container(
+            margin: EdgeInsets.only(top: 20.0),
+            alignment: Alignment.center,
+            child: FutureBuilder(
+              future: getBookDetail(),
+              builder: (BuildContext context, AsyncSnapshot snapshot){
+                if(snapshot.hasData == false || snapshot.hasError){
+                  return SizedBox(
+                    height: 50,
+                    width: 50,
+                    child: CircularProgressIndicator()
+                  );
+                }else{
+                  return SizedBox(
+                    child: snapshot.data,
+                  );
+                }
+              }
+            )
+          ),
+          Container(
+            child: FutureBuilder(
+              future: getGroupDetail(),
+              builder: (BuildContext context, AsyncSnapshot snapshot){
+                if(snapshot.hasData == false || snapshot.hasError){
+                  return SizedBox(
+                    height: 50,
+                    width: 50,
+                    child: CircularProgressIndicator()
+                  );
+                }else{
+                  return SizedBox(
+                      child: snapshot.data,
+                    );
+                }
+              }
+            )
+          ),
+          /*
           Padding(
-            padding: const EdgeInsets.only(top: 30.0, bottom: 10.0),
+            padding: const EdgeInsets.all(15.0),
+            child: FutureBuilder(
+              future: getDayGraph(),
+              builder: (BuildContext context, AsyncSnapshot snapshot){
+                if(snapshot.hasData == false || snapshot.hasError){
+                  return SizedBox(
+                    height: 50,
+                    width: 50,
+                    child: CircularProgressIndicator()
+                  );
+                }else{
+                  return Padding(
+                    padding: const EdgeInsets.only(left: 15.0, right: 15.0),
+                    child: SizedBox(
+                      height: 50,
+                      child: snapshot.data,),
+                  );
+                }
+              }
+            ),
+          ),
+          */
+          Padding(
+            padding: const EdgeInsets.only(top: 15.0, bottom: 10.0, left: 20.0),
             child: SizedBox(
               child: Text(
-                "모임 참가자",
+                "독서 진행 상황",
+                textAlign: TextAlign.start,
                 style: TextStyle(
-                  fontSize: 20.0,
+                  fontSize: 19.0,
+                  fontWeight: FontWeight.bold,
                 )
               ),
             ),
           ),
           Container(
-            margin: EdgeInsets.only(top: 20.0),
-            height: 200.0,
+            margin: EdgeInsets.only(top: 10.0),
+            height: 130.0,
             width : MediaQuery.of(context).size.width,
             child: FutureBuilder(
               future: getUserList(),
@@ -271,23 +415,23 @@ class _GroupInfoPageState extends State<GroupInfoPage> {
               }
             )
           ),
-          Expanded(
-            child: FutureBuilder(
-              future: getIssueList(),
-              builder: (BuildContext context, AsyncSnapshot snapshot){
-                if(snapshot.hasData == false || snapshot.hasError){
-                  return SizedBox(
-                    height: 50,
-                    width: 50,
-                    child: CircularProgressIndicator(),
-                  );
-                }else{
-                  return ListView(
-                    children: snapshot.data.toList(),
-                  );
-                }
-              }
-            )
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Text("독서 내용 공유하기",
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: colorScheme.color3,
+                ),
+              ),
+              IconButton(onPressed: (){
+                onIssuePressed(groupEntity.groupNo, userNoNameMap, userNo);
+                },
+               icon: Icon(Icons.send_rounded),
+              ),
+              SizedBox(width: 10,),
+            ],
           )
         ]
       ),

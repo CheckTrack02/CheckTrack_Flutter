@@ -4,6 +4,7 @@ import 'package:checktrack/loginPage.dart';
 import 'package:checktrack/group/GroupInfoPage.dart';
 import 'package:page_flip_builder/page_flip_builder.dart';
                        
+import 'package:checktrack/group/GroupPage.dart';
 
 void main() {
   runApp(_MyApp());
