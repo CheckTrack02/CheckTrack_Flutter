@@ -5,6 +5,8 @@ import 'package:checktrack/group/GroupPage.dart';
 
 
 class LoginPage extends StatefulWidget {
+  final VoidCallback? onFlip;
+  LoginPage({required this.onFlip});
   @override
   State<LoginPage> createState() => _LoginPageState();
 }

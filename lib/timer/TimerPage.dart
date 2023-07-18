@@ -13,13 +13,14 @@ import 'dart:math';
 
 class TimerPage extends StatefulWidget {
   BookEntity bookEntity;
+  
 
   TimerPage({required this.bookEntity});
   @override
   State<TimerPage> createState() => _TimerPageState(bookEntity: bookEntity);
 }
 
-class _TimerPageState extends State<TimerPage> with TickerProviderStateMixin {
+class _TimerPageState extends State<TimerPage> with TickerProviderStateMixin, WidgetsBindingObserver{
   BookEntity bookEntity;
   late UserBookEntity userBookEntity;
   bool isChangingText = false;
@@ -32,18 +33,34 @@ class _TimerPageState extends State<TimerPage> with TickerProviderStateMixin {
     TimerSystem.currentPage = userBookEntity.userPage;
     TimerSystem.recentTime = userBookEntity.userTime;
     TimerSystem.recentPage = userBookEntity.userPage;
+    
   }
   
   @override
   void initState(){
+    WidgetsBinding.instance.addObserver(this);
     _tabController = TabController(
       length: 2,
       vsync: this,
     );
+    TimerSystem.setGroupUserList();
     super.initState();
   }
 
+
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state){
+    if(state == AppLifecycleState.paused || state == AppLifecycleState.detached){
+      finishTimer();
+    }
+    super.didChangeAppLifecycleState(state);
+  }
+
   _TimerPageState({required this.bookEntity}){
+    SocketSystem.initSocket();
+    TimerSystem.isTimerStart = true;
+    TimerSystem.bookEntity = bookEntity;
     TimerSystem.currentDuration = 0;
     TimerSystem.currentTime = 0;
     TimerSystem.recentTime = 0;
@@ -65,10 +82,11 @@ class _TimerPageState extends State<TimerPage> with TickerProviderStateMixin {
         setState((){
           TimerSystem.currentDuration++;
           TimerSystem.currentTime++;
+          TimerSystem.checkUpdateList();
           if(TimerSystem.recentTime!=0){
             TimerSystem.currentPage = (TimerSystem.currentTime * TimerSystem.recentPage) ~/ TimerSystem.recentTime;
             TimerSystem.currentPage = min(TimerSystem.currentPage, bookEntity.bookPageNum);
-            print(TimerSystem.currentPage);
+            //print(TimerSystem.currentPage);
             if(!isChangingText){
               textEditingController.text = TimerSystem.currentPage.toString();
             }
@@ -85,6 +103,7 @@ class _TimerPageState extends State<TimerPage> with TickerProviderStateMixin {
       if(bookPage <= bookEntity.bookPageNum){
         TimerSystem.recentPage = bookPage;
         TimerSystem.recentTime = TimerSystem.currentTime;
+        SocketSystem.updateBookPage(TimerSystem.recentPage, TimerSystem.recentTime);
         setState(() {
           TimerSystem.currentPage = bookPage;
         });
@@ -94,6 +113,7 @@ class _TimerPageState extends State<TimerPage> with TickerProviderStateMixin {
 
   @override dispose(){
     textEditingController.dispose();
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
@@ -104,8 +124,6 @@ class _TimerPageState extends State<TimerPage> with TickerProviderStateMixin {
   }
 
   late Widget groupUserListWidget, allUserListWidget;
-
-  
 
   @override
   Widget build(BuildContext context) {
@@ -251,7 +269,11 @@ class _TimerPageState extends State<TimerPage> with TickerProviderStateMixin {
               child: TabBarView(
                 controller: _tabController,
                 children: [
-                  FutureBuilder(
+                  Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: getGroupUserListWidget(),
+                  ),
+                  /*FutureBuilder(
                     future: getGroupUserListWidget(),
                     builder: (BuildContext context, AsyncSnapshot<Widget> snapshot){
                       if(snapshot.hasData){
@@ -264,8 +286,12 @@ class _TimerPageState extends State<TimerPage> with TickerProviderStateMixin {
                         );
                       }
                     }
+                  ),*/
+                  Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: getAllUserListWidget(),
                   ),
-                  FutureBuilder(
+                  /*FutureBuilder(
                     future: getAllUserListWidget(),
                     builder: (BuildContext context, AsyncSnapshot<Widget> snapshot){
                       if(snapshot.hasData){
@@ -278,7 +304,7 @@ class _TimerPageState extends State<TimerPage> with TickerProviderStateMixin {
                         );
                       }
                     }
-                  )
+                  )*/
                 ]
               )
             )
@@ -288,15 +314,141 @@ class _TimerPageState extends State<TimerPage> with TickerProviderStateMixin {
     );
   }
 
-  Future<Widget> getGroupUserListWidget() async{
-    groupUserListWidget = Column();
+  bool isInitGroupUserListWidget = false;
+  Widget getGroupUserListWidget(){
+    //print("GET GROUP USER LIST WIDGET");
+    List<Widget> columnWidget = [];
+    List<Widget> rowWidget = [];
+    TimerSystem.groupUserMap.forEach((key, value){
+      String userName = key;
+      int userTime = value['userTime'];
+      int userPage = value['userPage'];
+      bool isInList = value['isInList'];
+      //print("$userName ${userTime.toString()} ${userPage.toString()} ${isInList.toString()}");
+      Color userColor = colorScheme.color6;
+      if(!isInList){
+        userColor = colorScheme.color3;
+      }else{
+        //print("USER NAME : $userName");
+        userTime = value['recentUserTime'] + TimerSystem.currentDuration;
+        userPage = min(bookEntity.bookPageNum, value['recentUserPage'] + (userPage * TimerSystem.currentDuration) ~/ userTime);
+
+        /* Percentage 따라서 색 결정
+        int percentage = (100 * userPage) ~/ bookEntity.bookPageNum;
+        */
+      } 
+      Widget widget = SizedBox(
+        width : 70,
+        height: 150,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            IconButton(
+              icon: Icon(Icons.auto_stories, color: userColor),
+              onPressed: null,
+            ),
+            Text(
+              userName,
+              style: TextStyle(fontSize: 20, color: userColor),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 5.0, bottom: 5.0),
+              child: Text(
+                TimerSystem.timeToString(userTime),
+                style: TextStyle(fontSize: 15, color: userColor),
+              ),
+            ),
+            Text(
+              "$userPage pg",
+              style: TextStyle(fontSize: 15, color: userColor),
+            )
+          ]
+        ),
+      );
+      rowWidget.add(widget);
+      if(rowWidget.length==4){
+        columnWidget.add(
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: rowWidget
+          )
+        );
+        rowWidget = [];
+      }
+    });
+    if(rowWidget.isNotEmpty){
+      while(rowWidget.length<4){
+        rowWidget.add(SizedBox(width: 70, height: 150));
+      }
+      columnWidget.add(
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: rowWidget
+        )
+      );
+    }
+    groupUserListWidget = ListView(children: columnWidget);
     return groupUserListWidget;
   }
 
-  Future<Widget> getAllUserListWidget() async{
-    allUserListWidget = Column();
+  Widget getAllUserListWidget(){
+    List<Widget> columnWidget = [];
+    List<Widget> rowWidget = [];
+    TimerSystem.roomUserList.forEach((key, value){
+      String userName = key;
+      int userTime = value['userTime'];
+      int userPage = value['userPage'];
+      Color userColor = colorScheme.color6;
+      userPage = min(bookEntity.bookPageNum, value['recentUserPage'] + (userPage * TimerSystem.currentDuration) ~/ userTime);
+      userTime = value['recentUserTime'] + TimerSystem.currentDuration;
+      print(userTime.toString() + " " + userPage.toString());
+      Widget widget = SizedBox(
+        width : 70,
+        height: 150,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            IconButton(
+              icon: Icon(Icons.auto_stories, color: userColor),
+              onPressed: null,
+            ),
+            Text(
+              userName,
+              style: TextStyle(fontSize: 20, color: userColor),
+            ),
+            
+            Text(
+              "$userPage pg",
+              style: TextStyle(fontSize: 15, color: userColor),
+            )
+          ]
+        ),
+      );
+      rowWidget.add(widget);
+      if(rowWidget.length==4){
+        columnWidget.add(
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: rowWidget
+          )
+        );
+        rowWidget = [];
+      }
+    });
+    if(rowWidget.length>0){
+      while(rowWidget.length<4){
+        rowWidget.add(SizedBox(width: 70, height: 150));
+      }
+      columnWidget.add(
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: rowWidget
+        )
+      );
+    }
+    allUserListWidget = ListView(children: columnWidget);
     return allUserListWidget;
   }
 
-  
+
 }

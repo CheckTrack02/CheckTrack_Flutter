@@ -104,6 +104,26 @@ class UserAPISystem{
       userTime: jsonDecode(response.body)['userTime']
     );
   }
+  static Future<List<UserEntity>> getGroupListUserList(List<int> groupList) async{
+    //final response = await APISystem.getResponse("/user/user-get-group-list-user-no-list?groupList=${groupList}", "GET", null);
+    final response = await APISystem.getResponse("/user/user-get-group-list-user-no-list", "POST", {
+      "groupList": groupList,
+    });
+    List<int> userNoList = [];
+    for(int i=0 ;i<jsonDecode(response.body).length; i++){
+      print(jsonDecode(response.body)[i]);
+      userNoList.add(jsonDecode(response.body)[i]['userNo']);
+    }
+    for(int i=0; i<userNoList.length; i++){
+      print(userNoList[i]);
+    }
+    userNoList = userNoList.toSet().toList();
+    List<UserEntity> userList = [];
+    for(int i=0; i<userNoList.length; i++){
+      userList.add(await UserAPISystem.getUserEntity(userNoList[i]));
+    }
+    return userList;
+  }
 }
 
 class GroupAPISystem{
@@ -120,7 +140,7 @@ class GroupAPISystem{
   }
 
   static Future<List<GroupEntity>> getUserGroupList (int userNo) async{
-    final response = await APISystem.getResponse("/group/get-user-group-no-list?groupNo=${userNo}", "GET", null);
+    final response = await APISystem.getResponse("/group/get-user-group-no-list?userNo=${userNo}", "GET", null);
     List<GroupEntity> groupList = [];
     List<dynamic> groupNoList = jsonDecode(response.body);
     for(int i = 0; i < groupNoList.length; i++){
@@ -128,6 +148,20 @@ class GroupAPISystem{
       groupList.add(await GroupAPISystem.getGroupEntity(groupNo));
     }
     return groupList;
+  }
+
+  static Future<List<int>> getUserBookGroupNoList(int userNo, int bookNo) async{
+    //print(userNo.toString() + " " + bookNo.toString());
+    List<GroupEntity> groupList = await getUserGroupList(userNo);
+    List<int> groupNoList = [];
+    //print(groupList.length);
+    for(int i=0; i<groupList.length; i++){
+      //print(groupList[i].groupName + " " + groupList[i].groupBookNo.toString());
+      if(groupList[i].groupBookNo == bookNo){
+        groupNoList.add(groupList[i].groupNo);
+      }
+    }
+    return groupNoList;
   }
 }
 
@@ -232,13 +266,19 @@ class UserBookAPISystem{
   }
   static void updateUserBookEntity(int userNo, int bookNo, int userTime, int userPage, String bookType) async{
       final response = await APISystem.getResponse("/user-book/update-user-book-entity", "POST", {
-      "userNo": userNo,
-      "bookNo": bookNo,
-      "userTime": userTime,
-      "userPage": userPage,
-      "bookType": bookType,
+        "userNo": userNo,
+        "bookNo": bookNo,
+        "userTime": userTime,
+        "userPage": userPage,
+        "bookType": bookType,
       });
-      return;
+  }
+  static Future<List<UserBookEntity>> getUserListUserBookList(List<UserEntity> userList, int bookNo) async{
+    List<UserBookEntity> userBookList = [];
+    for(int i=0; i<userList.length; i++){
+      userBookList.add(await getUserBookEntity(userList[i].userNo, bookNo));
+    }
+    return userBookList;
   }
 }
 

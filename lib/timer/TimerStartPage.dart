@@ -11,7 +11,8 @@ import 'package:checktrack/system/TimerSystem.dart';
 
 
 class TimerStartPage extends StatefulWidget {
-  TimerStartPage();
+  final VoidCallback? onFlip;
+  TimerStartPage({required this.onFlip});
   @override
   State<TimerStartPage> createState() => _TimerStartPageState();
 }
@@ -25,15 +26,17 @@ class _TimerStartPageState extends State<TimerStartPage> {
     List<BookEntity> bookList = await BookAPISystem.getReadingBookList(userEntity.userNo);
     //print(bookList.length);
     if(bookList.isNotEmpty){
-      setState((){
+      if(mounted){
+        setState((){
           bookEntity = bookList[0];
           bookImage = bookList[0].bookImage;
-      });
+        });
+      }
     }
   }
   _TimerStartPageState(){
     bookImage = "https://media.istockphoto.com/id/508545844/photo/question-mark-from-books-searching-information-or-faq-edication.jpg?s=612x612&w=0&k=20&c=-RTL7PuuaYZWifHcE4lvNFjqPY_J9VpqMNegcc3sdgA=";
-    SocketSystem.initSocket();
+    //SocketSystem.initSocket();
     setBookEntity();
   }
 
@@ -57,10 +60,16 @@ class _TimerStartPageState extends State<TimerStartPage> {
     }
 
     void startBookTimer() async{
+      if(bookImage == "https://media.istockphoto.com/id/508545844/photo/question-mark-from-books-searching-information-or-faq-edication.jpg?s=612x612&w=0&k=20&c=-RTL7PuuaYZWifHcE4lvNFjqPY_J9VpqMNegcc3sdgA="){
+        return;
+      }
       final result = await Navigator.of(context).push(MaterialPageRoute(
         builder: (BuildContext context) => TimerPage(bookEntity: bookEntity),
       ));
+
+      TimerSystem.finishTimer();
       SocketSystem.disconnectSocket();
+      
       int userNo = APISystem.getUserEntity().userNo; 
       int bookNo = bookEntity.bookNo; 
       int userTime = TimerSystem.currentTime;
@@ -89,13 +98,56 @@ class _TimerStartPageState extends State<TimerStartPage> {
             Align(
               alignment: Alignment.center,
               child: Container(
-                constraints: BoxConstraints(
-                  maxWidth: MediaQuery.of(context).size.width * 0.6,
-                  maxHeight: MediaQuery.of(context).size.height * 0.6,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16.0),
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.5),
+                      spreadRadius: 10,
+                      blurRadius: 7,
+                      offset: Offset(0, 3),
+                    )
+                  ]
                 ),
-                child: Image(
-                  
-                  image: NetworkImage(bookImage)
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16.0),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        boxShadow:[
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.5),
+                            spreadRadius: 5,
+                            blurRadius: 7,
+                            offset: Offset(0, 3),
+                          )
+                        ]
+                      ),
+                      constraints: BoxConstraints(
+                        maxWidth: MediaQuery.of(context).size.width * 0.6,
+                        maxHeight: MediaQuery.of(context).size.height * 0.6,
+                      ),
+                      child: Image(
+                        image: NetworkImage(bookImage),
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                ),
+              )
+            ),
+            Align(
+              alignment: Alignment.center,
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 6.0),
+                child: IconButton(
+                  icon: Icon(Icons.timer, color: colorScheme.color6),
+                  iconSize: 70,
+                  onPressed: (){
+                    startBookTimer();
+                  }
                 ),
               )
             ),
@@ -108,7 +160,7 @@ class _TimerStartPageState extends State<TimerStartPage> {
                 ),
                 child: IconButton(
                   icon: Icon(Icons.play_arrow, color: colorScheme.color1),
-                  iconSize: 30,
+                  iconSize: 40,
                   onPressed: (){
                       startBookTimer();
                   }
@@ -116,15 +168,31 @@ class _TimerStartPageState extends State<TimerStartPage> {
               )
             ),
             Positioned(
-              left: 0,
-              right: 0,
-              top: MediaQuery.of(context).size.height * 0.1,
-              child: IconButton(
-                icon: Icon(Icons.bookmarks, color: Colors.brown),
-                iconSize: 30,
-                onPressed: (){
-                  selectBook();
-                }
+              width: 50,
+              left: MediaQuery.of(context).size.width * 0.5 - 25,
+              top: MediaQuery.of(context).size.height * 0.07,
+              child: Container(
+                width: 50,
+                height: 50,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16.0),
+                  boxShadow:[
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.5),
+                      spreadRadius: 5,
+                      blurRadius: 7,
+                      offset: Offset(0, 3),
+                    )
+                  ]
+                ),
+                child: IconButton(
+                  icon: Icon(Icons.bookmarks, color: Colors.brown),
+                  iconSize: 30,
+                  onPressed: (){
+                    selectBook();
+                  }
+                ),
               )
             ),
           ],
