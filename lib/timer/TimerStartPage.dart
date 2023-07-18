@@ -91,7 +91,7 @@ class _TimerStartPageState extends State<TimerStartPage> {
       ),
       body: Container(
         decoration: const BoxDecoration(
-          color: colorScheme.color1,
+          color: Colors.white,
         ),
         child: Stack(
           children: [
@@ -187,7 +187,7 @@ class _TimerStartPageState extends State<TimerStartPage> {
                   ]
                 ),
                 child: IconButton(
-                  icon: Icon(Icons.bookmarks, color: Colors.brown),
+                  icon: Icon(Icons.bookmarks, color: colorScheme.color3),
                   iconSize: 30,
                   onPressed: (){
                     selectBook();
