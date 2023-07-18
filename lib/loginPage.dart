@@ -14,16 +14,16 @@ class _LoginPageState extends State<LoginPage> {
   TextEditingController controller2 = TextEditingController();
 
   void onLoginPressed() async{
-    int statusCode = await UserAPISystem.fetchUser(controller.text, controller2.text);
-    print(statusCode);
-    if (statusCode == 200) {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (BuildContext context) =>
-                    GroupPage(userNo: 1)));
-      }
-    else if (statusCode == 401) {
+    Map res = await UserAPISystem.fetchUser(controller.text, controller2.text);
+    
+    if (res["statusCode"] == 200) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (BuildContext context) =>
+            GroupPage(userNo: res["userNo"])));
+    }
+    else if (res["statusCode"] == 401) {
       showSnackBar(context, Text('Wrong identifier'));
     }
     else {
@@ -71,33 +71,33 @@ class _LoginPageState extends State<LoginPage> {
                           controller: controller,
                           decoration: InputDecoration(labelText: 'Enter id'),
                           keyboardType: TextInputType.emailAddress,
-                        ),
-                        TextField(
-                          controller: controller2,
-                          decoration: InputDecoration(labelText: 'Enter password'),
-                          keyboardType: TextInputType.text,
-                          obscureText: true, // 비밀번호 안보이도록 하는 것
-                        ),
-                        SizedBox(height: 40.0,),
-                        ButtonTheme(
-                          minWidth: 100.0,
-                          height: 50.0,
-                          child: ElevatedButton( 
-                              onPressed: (){
-                                 onLoginPressed();
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: colorScheme.color4,
-                              ),
-                              child: Text(
-                                'Login',
-                                style: TextStyle(
-                                  fontSize: 16.0, 
-                                  color: Colors.white,
-                                  ),
-                              ),
+                          ),
+                          TextField(
+                            controller: controller2,
+                            decoration: InputDecoration(labelText: 'Enter password'),
+                            keyboardType: TextInputType.text,
+                            obscureText: true, // 비밀번호 안보이도록 하는 것
+                          ),
+                          SizedBox(height: 40.0,),
+                          ButtonTheme(
+                            minWidth: 100.0,
+                            height: 50.0,
+                            child: ElevatedButton( 
+                                onPressed: (){
+                                  onLoginPressed();
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: colorScheme.color4,
+                                ),
+                                child: Text(
+                                  'Login',
+                                  style: TextStyle(
+                                    fontSize: 16.0, 
+                                    color: Colors.white,
+                                    ),
+                                ),
+                            )
                           )
-                        )
                       ]),
                     )
                   )

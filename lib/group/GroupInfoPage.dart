@@ -13,29 +13,31 @@ import 'package:checktrack/group/IssuePage.dart';
 
 class GroupInfoPage extends StatefulWidget {
   final GroupEntity groupEntity;
+  final int userNo;
 
   GroupInfoPage({ 
     required this.groupEntity,
+    required this.userNo,
   });
 
   @override
-  State<GroupInfoPage> createState() => _GroupInfoPageState(groupEntity);
+  State<GroupInfoPage> createState() => _GroupInfoPageState(groupEntity, userNo);
 }
 
 class _GroupInfoPageState extends State<GroupInfoPage> {
   final GroupEntity groupEntity;
+  final int userNo;
   late BookEntity bookEntity;
 
   List<UserEntity> userList = [];
   List<GroupUserEntity> groupUserList = [];
   Map<int, String> userNoNameMap = {};
 
-  _GroupInfoPageState(this.groupEntity);
+  _GroupInfoPageState(this.groupEntity, this.userNo);
   
 
   Future<bool> loadGroupUser() async{
     bookEntity = await BookAPISystem.getBookEntity(groupEntity.groupBookNo);
-    print(groupEntity.groupNo);
     if(userList.isEmpty){
       userList = await UserAPISystem.getGroupUserList(groupEntity.groupNo);
       for(int i=0; i<userList.length; i++){
@@ -51,13 +53,14 @@ class _GroupInfoPageState extends State<GroupInfoPage> {
   @override
   Widget build(BuildContext context) {
 
-    void onIssuePressed(mGroupNo, mUserMap) async {
+    void onIssuePressed(mGroupNo, mUserMap, mUserNo) async {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (BuildContext context) => IssuePage(groupNo: mGroupNo, userNoNameMap: mUserMap,)));
+          builder: (BuildContext context) => IssuePage(groupNo: mGroupNo, userNo: mUserNo, userNoNameMap: mUserMap,)));
     }
 
+    /*
     SfLinearGauge makeDayGauge(){
       int period = groupEntity.groupEndDate.difference(groupEntity.groupStartDate).inDays;
       debugPrint(period.toString());
@@ -84,6 +87,7 @@ class _GroupInfoPageState extends State<GroupInfoPage> {
         showTicks: false,
       );
     }
+    */
 
     SfRadialGauge makeGauge(int userPage) {
       int bookPage = bookEntity.bookPageNum;
@@ -125,7 +129,7 @@ class _GroupInfoPageState extends State<GroupInfoPage> {
             ],
             pointers: <GaugePointer>[
               RangePointer(
-                value: userPage.toDouble() + 12,
+                value: userPage.toDouble() + 5,
                 width: 5,
                 pointerOffset: 0,
                 cornerStyle: CornerStyle.bothCurve,
@@ -136,7 +140,7 @@ class _GroupInfoPageState extends State<GroupInfoPage> {
               ),
               MarkerPointer(
                 value: userPage.toDouble(),
-                color: Colors.brown,
+                color: colorScheme.color1,
                 markerType: MarkerType.circle,
               ),
             ]
@@ -178,6 +182,21 @@ class _GroupInfoPageState extends State<GroupInfoPage> {
     Future<Widget> getGroupDetail() async {
       bool isFinished = await loadGroupUser();
       int toNow = DateTime.now().difference(groupEntity.groupStartDate).inDays + 1;
+      List<Text> memberList = [];
+      memberList.add(Text(
+                      userList[0].userName,
+                      style: TextStyle(
+                      fontSize: 16.0,
+                      ),
+                    ));
+      for(int i = 1; i < userList.length; i++){
+        memberList.add(Text(", "+userList[i].userName,
+                      style: TextStyle(
+                      fontSize: 16.0,
+                      )
+                    ));
+      }
+
       Widget groupWidget = Padding(
         padding: const EdgeInsets.all(20.0),
           child: Container(
@@ -231,19 +250,12 @@ class _GroupInfoPageState extends State<GroupInfoPage> {
                     )
                   ),
                   SizedBox(height: 10,),
-                  Row(children: [
-                    Text(
-                      userList[0].userName,
-                      style: TextStyle(
-                      fontSize: 16.0,
-                      ),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: memberList,
                     ),
-                    for(int i=1; i<userList.length; i++)
-                      Text(", "+userList[i].userName,
-                      style: TextStyle(
-                      fontSize: 16.0,
-                    )),
-                  ],),
+                  ),
                   SizedBox(height: 10,),
                 ],
               ),
@@ -289,7 +301,6 @@ class _GroupInfoPageState extends State<GroupInfoPage> {
         );
         widgetList.add(widget);
       }
-
 
       return widgetList;
     }
@@ -415,9 +426,9 @@ class _GroupInfoPageState extends State<GroupInfoPage> {
                 ),
               ),
               IconButton(onPressed: (){
-                onIssuePressed(groupEntity.groupNo, userNoNameMap);
+                onIssuePressed(groupEntity.groupNo, userNoNameMap, userNo);
                 },
-               icon: Icon(Icons.send),
+               icon: Icon(Icons.send_rounded),
               ),
               SizedBox(width: 10,),
             ],

@@ -1,5 +1,6 @@
 import 'package:checktrack/db/GroupEntity.dart';
 import 'package:checktrack/group/GroupInfoPage.dart';
+import 'package:checktrack/group/GroupAddPage.dart';
 import 'package:checktrack/system/apiSystem.dart';
 import 'package:flutter/material.dart';
 import 'package:checktrack/system/utilsSystem.dart';
@@ -20,9 +21,13 @@ class _GroupPageState extends State<GroupPage> {
   List<String> bookImageList = [];
 
   Future<bool> loadGroupList() async {
+    bookImageList.clear();
     groupList = await GroupAPISystem.getUserGroupList(userNo);
+    print(groupList);
     for (GroupEntity item in groupList) {
       final response = await BookAPISystem.getBookEntity(item.groupBookNo);
+      print(item.groupBookNo.toString());
+      print(response.bookImage);
       bookImageList.add(response.bookImage);
     }
     return true;
@@ -31,21 +36,30 @@ class _GroupPageState extends State<GroupPage> {
   @override
   Widget build(BuildContext context) {
 
+    void onAddPressed(mUserNo) async {
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (BuildContext context) => GroupAddPage(userNo: mUserNo)));
+      setState(() { });
+    }
+
     Future<List<Widget>> makeGrid() async {
       bool isFinished = await loadGroupList();
       List<Widget> gridBooks = [];
 
-      void onGroupPressed(mGroup) async {
+      void onGroupPressed(mGroup, mUserNo) async {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (BuildContext context) => GroupInfoPage(groupEntity: mGroup)));
+            builder: (BuildContext context) => GroupInfoPage(groupEntity: mGroup, userNo: mUserNo)));
       }
+
 
       for (int i = 0; i < groupList.length; i += 3) {
         List<Widget> row = [];
         for (int j = i; j < i + 3; j++) {
-          if (j >= bookImageList.length) {
+          if (j >= groupList.length) {
             row.add(SizedBox(
               width: 100,
             ));
@@ -54,7 +68,7 @@ class _GroupPageState extends State<GroupPage> {
             row.add(Column(children: [
               GestureDetector(
                   onTap: () {
-                    onGroupPressed(groupList[j]);
+                    onGroupPressed(groupList[j], userNo);
                   },
                   child: Image(
                     image: NetworkImage(bookImageList[j]),
@@ -87,35 +101,41 @@ class _GroupPageState extends State<GroupPage> {
 
     return Scaffold(
       appBar: AppBar(
-          automaticallyImplyLeading: false,
-          backgroundColor: colorScheme.color4,
-          title: Row(
-            children: [
-              Icon(
-                Icons.people,
-              ),
-              SizedBox(
-                width: 15,
-              ),
-              Text("READING GROUP", style: TextStyle(color: Colors.white)),
-            ],
-          )),
+        automaticallyImplyLeading: false,
+        backgroundColor: colorScheme.color4,
+        title: Row(
+          children: [
+            Icon(
+              Icons.people,
+            ),
+            SizedBox(
+              width: 15,
+            ),
+            Text("READING GROUP", style: TextStyle(color: Colors.white)),
+          ],
+        )),
       body: FutureBuilder(
-              future: makeGrid(),
-              builder: (BuildContext context, AsyncSnapshot snapshot){
-                if(snapshot.hasData == false || snapshot.hasError){
-                  return SizedBox(
-                    height: 50,
-                    width: 50,
-                    child: CircularProgressIndicator()
-                  );
-                }else{
-                  return Column(
-                    children: snapshot.data.toList(),
-                  );
-                }
-              }
-            )
+        future: makeGrid(),
+        builder: (BuildContext context, AsyncSnapshot snapshot){
+          if(snapshot.hasData == false || snapshot.hasError){
+            return SizedBox(
+              height: 50,
+              width: 50,
+              child: CircularProgressIndicator()
+            );
+          }else{
+            return Column(
+              children: snapshot.data.toList(),
+            );
+          }
+        }
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.group_add),
+        backgroundColor: colorScheme.color3,
+        focusColor: colorScheme.color1,
+        onPressed: () { onAddPressed(this.userNo); },
+      ),    
     );
   }
 }

@@ -1,3 +1,4 @@
+import 'package:checktrack/group/IssuePostPage.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:checktrack/system/apiSystem.dart';
@@ -7,21 +8,23 @@ import 'package:checktrack/group/CommentPage.dart';
 
 class IssuePage extends StatefulWidget {
   final int groupNo;
+  final int userNo;
   Map<int, String> userNoNameMap = {};
 
-  IssuePage({required this.groupNo, required this.userNoNameMap});
+  IssuePage({required this.groupNo, required this.userNo, required this.userNoNameMap});
 
   @override
-  State<IssuePage> createState() => _IssuePageState(groupNo, userNoNameMap);
+  State<IssuePage> createState() => _IssuePageState(groupNo, userNo, userNoNameMap);
 }
 
 class _IssuePageState extends State<IssuePage> {
   
   late List<IssueEntity> issueList = [];
   final int groupNo;
+  final int userNo;
   Map<int, String> userNoNameMap = {};
 
-  _IssuePageState(this.groupNo, this.userNoNameMap);
+  _IssuePageState(this.groupNo, this.userNo, this.userNoNameMap);
 
   Future<bool> loadIssueList() async{
     issueList = await IssueAPISystem.getGroupIssueList(groupNo);
@@ -35,10 +38,23 @@ class _IssuePageState extends State<IssuePage> {
   Widget build(BuildContext context) {
 
     void onCommentPressed(mIssue, mUserMap) async {
-      Navigator.push(
+      await Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (BuildContext context) => CommentPage(issue: mIssue, userNoNameMap: mUserMap,)));
+          builder: (BuildContext context) => CommentPage(issue: mIssue, userNo: this.userNo, userNoNameMap: mUserMap,)));
+      setState((){
+        loadIssueList();
+      });
+    }
+
+    void onPostPressed(mGroupNo, mUserNo) async {
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (BuildContext context) => IssuePostPage(groupNo: mGroupNo, userNo: this.userNo, userNoNameMap: this.userNoNameMap,)));
+      setState((){
+        loadIssueList();
+      });
     }
 
     Future<List<Widget>> getIssueList() async{
@@ -154,29 +170,19 @@ class _IssuePageState extends State<IssuePage> {
                 }else{
                   return ListView(
                     children: snapshot.data.toList(),
+
                   );
                 }
               }
             )
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Text("독서 내용 공유하기",
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: colorScheme.color3,
-                ),
-              ),
-              IconButton(onPressed: (){
-                },
-               icon: Icon(Icons.send),
-              ),
-              SizedBox(width: 10,),
-            ],
-          )
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.history_edu),
+        backgroundColor: colorScheme.color3,
+        focusColor: colorScheme.color1,
+        onPressed: () { onPostPressed(groupNo, 1); },
       ),
     );
   }

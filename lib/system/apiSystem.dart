@@ -7,6 +7,7 @@ import 'package:checktrack/db/GroupUserEntity.dart';
 import 'package:checktrack/db/BookEntity.dart';
 import 'package:checktrack/db/IssueEntity.dart';
 import 'package:checktrack/db/CommentEntity.dart';
+import 'package:intl/intl.dart';
 
 const int PORT_NO = 80;
 const String httpUrl = "http://172.10.5.144:${PORT_NO}";
@@ -38,13 +39,17 @@ class APISystem{
 }
 
 class UserAPISystem{
-  static Future<int> fetchUser(String userId, String userPw) async {
+  static Future<Map> fetchUser(String userId, String userPw) async {
     final response = await APISystem.getResponse("/login", "POST", {
       "userId": userId,
       "userPw": userPw
     });
-    return response.statusCode;
+    return {
+      "statusCode" : response.statusCode,
+      "userNo" : jsonDecode(response.body)['userNo'],
+    };
   }
+
   static Future<UserEntity> getUserEntity(int userNo) async{
     final response = await APISystem.getResponse("/user/get-user-entity?userNo=${userNo}", "GET", null);
     //print(response.body);
@@ -96,10 +101,32 @@ class GroupAPISystem{
     List<dynamic> groupNoList = jsonDecode(response.body);
     for(int i = 0; i < groupNoList.length; i++){
       int groupNo = groupNoList[i]['groupNo'];
-      print(groupNo);
       groupList.add(await GroupAPISystem.getGroupEntity(groupNo));
     }
     return groupList;
+  }
+
+  static Future<int> postGroupEntity (String groupName, int groupBookNo, String groupStartDate, String groupEndDate) async{
+    print("post group server");
+    final response = await APISystem.getResponse("/group/post-group-entity", "POST", {
+      "groupName": groupName,
+      "groupBookNo": groupBookNo,
+      "groupStartDate": groupStartDate,
+      "groupEndDate": groupEndDate,
+    });
+
+    return jsonDecode(response.body)['groupNo'];
+  }
+
+  static Future<int> postGroupUser (int userNo, int groupNo, int groupBookNo) async{
+    print("post group server");
+    final response = await APISystem.getResponse("/group/post-group-user", "POST", {
+      "userNo": userNo,
+      "groupNo": groupNo,
+      "groupBookNo": groupBookNo,
+    });
+    print(response.statusCode.toString());
+    return response.statusCode;
   }
 }
 
@@ -114,6 +141,22 @@ class BookAPISystem{
       bookImage: jsonDecode(response.body)['bookImage'],
       bookPageNum: jsonDecode(response.body)['bookPageNum'],
     );
+  }
+
+  static Future<List<BookEntity>> getSearchBookEntity (String bookSearch) async{
+    final response = await APISystem.getResponse("/book/get-search-book-entity?bookSearch=${bookSearch}", "GET", null);
+    List<BookEntity> bookList = [];
+    List<dynamic> res = jsonDecode(response.body);
+    for(int i=0; i<res.length; i++){
+      bookList.add(BookEntity(
+        bookNo: res[i]['bookNo'],
+        bookAuthor: res[i]['bookAuthor'],
+        bookImage: res[i]['bookImage'],
+        bookName: res[i]['bookName'],
+        bookPageNum: res[i]['bookPageNum'],
+      ));
+    }
+    return bookList;
   }
 }
 
@@ -148,6 +191,18 @@ class IssueAPISystem{
     }
     return issueList;
   }
+
+  static Future<int> postIssueEntity (String issueTitle, String issueContext, int userNo, int groupNo) async{
+    print("post issue server");
+    final response = await APISystem.getResponse("/issue/post-issue-entity", "POST", {
+      "issueTitle": issueTitle,
+      "issueContext": issueContext,
+      "issueUserNo": userNo,
+      "issueGroupNo": groupNo,
+      "issueDate": DateFormat('yyyy-MM-dd').format(DateTime.now()),
+    });
+    return response.statusCode;
+  }
 }
 
 class CommentAPISystem{
@@ -165,6 +220,16 @@ class CommentAPISystem{
       ));
     }
     return commentList;
+  }
+
+  static Future<int> postCommentEntity (String commentText, int issueNo, int userNo) async{
+    final response = await APISystem.getResponse("/comment/post-comment-entity", "POST", {
+      "commentText": commentText,
+      "commentUserNo": userNo,
+      "commentIssueNo": issueNo,
+      "commentDate": DateFormat('yyyy-MM-dd').format(DateTime.now()),
+    });
+    return response.statusCode;
   }
 }
 
