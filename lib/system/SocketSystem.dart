@@ -60,6 +60,7 @@ class SocketSystem{
     int userNo = APISystem.getUserEntity().userNo;
     String userName = APISystem.getUserEntity().userName;
     int startTime = DateTime.now().millisecondsSinceEpoch;
+    print(startTime.toString());
     TimerSystem.currentStartTime = startTime;
     Map messageMap = {
       'userNo': userNo,
