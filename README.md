@@ -21,9 +21,7 @@
 ### Login
 |로그인|회원 가입|
 |--|--|
-|![KakaoTalk_Photo_2023-07-19-17-49-47 001](https://github.com/CheckTrack02/CheckTrack_Flutter/assets/36194346/9741711c-da24-48d3-80d5-5269f98cff13)
-|![KakaoTalk_Photo_2023-07-19-17-49-48 002](https://github.com/CheckTrack02/CheckTrack_Flutter/assets/36194346/4aea790b-5386-4e7f-ab1f-ee94da030b79)
-|
+|![KakaoTalk_Photo_2023-07-19-17-49-47 001](https://github.com/CheckTrack02/CheckTrack_Flutter/assets/36194346/9741711c-da24-48d3-80d5-5269f98cff13)|![KakaoTalk_Photo_2023-07-19-17-49-48 002](https://github.com/CheckTrack02/CheckTrack_Flutter/assets/36194346/4aea790b-5386-4e7f-ab1f-ee94da030b79)|
 
 ![KakaoTalk_Photo_2023-07-19-17-49-47 001](https://github.com/CheckTrack02/CheckTrack_Flutter/assets/36194346/b704806d-b69f-4a1a-a111-b2c1e7968cfe)
 > Si
