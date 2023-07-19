@@ -22,7 +22,7 @@ class _TimerStartPageState extends State<TimerStartPage> {
   late BookEntity bookEntity;
   late String bookImage;
   void setBookEntity() async{
-    UserEntity userEntity = await APISystem.initUserEntity();
+    UserEntity userEntity = APISystem.getUserEntity();
     List<BookEntity> bookList = await BookAPISystem.getReadingBookList(userEntity.userNo);
     //print(bookList.length);
     if(bookList.isNotEmpty){
@@ -51,12 +51,14 @@ class _TimerStartPageState extends State<TimerStartPage> {
         ));
 
         //print(result);
-        setState((){
-          if(result!=null){
-            bookEntity = result;
-            bookImage = result.bookImage;
-          }
-        });
+        if(mounted){
+          setState((){
+            if(result!=null){
+              bookEntity = result;
+              bookImage = result.bookImage;
+            }
+          });
+        }
     }
 
     void startBookTimer() async{
@@ -155,11 +157,11 @@ class _TimerStartPageState extends State<TimerStartPage> {
               alignment: Alignment.center,
               child: Container(
                 decoration: const ShapeDecoration(
-                  color: colorScheme.color6,
+                  color: colorScheme.color3,
                   shape: CircleBorder(),
                 ),
                 child: IconButton(
-                  icon: Icon(Icons.play_arrow, color: colorScheme.color1),
+                  icon: Icon(Icons.play_arrow, color: Colors.white,),
                   iconSize: 40,
                   onPressed: (){
                       startBookTimer();

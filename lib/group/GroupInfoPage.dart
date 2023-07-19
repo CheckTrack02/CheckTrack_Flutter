@@ -59,6 +59,97 @@ class _GroupInfoPageState extends State<GroupInfoPage> {
         MaterialPageRoute(
           builder: (BuildContext context) => IssuePage(groupNo: mGroupNo, userNo: mUserNo, userNoNameMap: mUserMap,)));
     }
+    
+    void onInviteMember() async {
+      TextEditingController searchController = TextEditingController();
+      String info = "";
+      await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+              return ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: Dialog( // Use Dialog instead of AlertDialog
+                  insetPadding: EdgeInsets.symmetric(horizontal: 40), // Optional: Adjust the insetPadding to control the width of the dialog
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: SizedBox(
+                    width: 300,
+                    height: 150,
+                    child: Column(
+                      children: [
+                        SizedBox(height: 20,),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              width: 250,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                color: Colors.grey.withOpacity(0.3),
+                                borderRadius: BorderRadius.circular(20),
+                                ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                SizedBox(
+                                  width: 200,
+                                  height: 30,
+                                  child: TextField(
+                                  controller: searchController,
+                                  textAlign: TextAlign.center,
+                                  decoration: InputDecoration(
+                                    contentPadding: EdgeInsets.only(bottom: 12),
+                                    hintText: '아이디로 초대하세요',
+                                    border: InputBorder.none,),
+                                  ),
+                                ),
+                                IconButton(
+                                  onPressed: () async {
+                                    Map member = await UserAPISystem.getIdUserNo(searchController.text);
+                                    print(member["statusCode"]);
+                                    if (member["statusCode"] == 401){
+                                      setState(() {
+                                        info = "해당 유저가 존재하지 않습니다.";
+                                      });
+                                    }
+                                    else {
+                                      int statusCode = await GroupAPISystem.postGroupUser(member["userNo"], groupEntity.groupNo, bookEntity.bookNo);
+                                      if (statusCode == 200){
+                                        setState(() {
+                                          info = "${searchController.text}를 초대하였습니다.";
+                                          searchController.text = "아이디로 초대하세요";
+                                        });
+                                      }
+                                    }
+                                  },
+                                  icon: Icon(Icons.person_add),
+                                ),
+                              ],)
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 10),
+                        Text(info,
+                          style: TextStyle(
+                            fontSize: 15, 
+                            color: colorScheme.color3),
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
+          );
+        },
+      );
+      setState(() {
+        loadGroupUser();
+      });
+    }
 
     SfRadialGauge makeGauge(int userPage) {
       int bookPage = bookEntity.bookPageNum;
@@ -276,12 +367,17 @@ class _GroupInfoPageState extends State<GroupInfoPage> {
     }
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: Text("READING JOURNAL", style: TextStyle(color: Colors.white)),
         elevation: 0.0,
         backgroundColor: colorScheme.color4,
         centerTitle: true,
-        actions: [IconButton(onPressed: (){}, icon: Icon(Icons.group_add_outlined))],
+        actions: [IconButton(
+          onPressed: (){
+            onInviteMember();
+          }, 
+          icon: Icon(Icons.group_add_outlined))],
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

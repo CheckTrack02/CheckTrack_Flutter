@@ -22,9 +22,9 @@ class APISystem{
     return myUserEntity;
   }
 
-  static Future<UserEntity> initUserEntity() async{
+  static Future<UserEntity> initUserEntity(int userNo) async{
     // TEST
-    UserEntity userEntity = await UserAPISystem.getUserEntity(1);
+    UserEntity userEntity = await UserAPISystem.getUserEntity(userNo);
     setUserEntity(userEntity);
     return userEntity;
   }
@@ -90,6 +90,17 @@ class UserAPISystem{
       userPw: jsonDecode(response.body)['userPw']
     );
   }
+    static Future<Map> getIdUserNo(String userId) async{
+    final response = await APISystem.getResponse("/user/get-id-user-entity?userId=${userId}", "GET", null);
+    print(response.body);
+    return {
+      "statusCode": response.statusCode,
+      "userNo": jsonDecode(response.body)['userNo'], 
+      "userName": jsonDecode(response.body)['userName'], 
+    };
+  }
+
+
   static Future<List<UserEntity>> getGroupUserList(int groupNo) async{
     final response = await APISystem.getResponse("/user/get-group-user-no-list?groupNo=${groupNo}", "GET", null);
     List<UserEntity> userList = [];

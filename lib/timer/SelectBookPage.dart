@@ -60,7 +60,7 @@ class _SelectBookPageState extends State<SelectBookPage> with TickerProviderStat
                       height: 120,
                     )),
                 SizedBox(
-                  height: 15,
+                  height: 15
                 ),
                 Text(
                   readingBookList[j].bookName,
@@ -68,6 +68,7 @@ class _SelectBookPageState extends State<SelectBookPage> with TickerProviderStat
                     overflow: TextOverflow.ellipsis,
                   style: TextStyle(),
                 ),
+                SizedBox(height: 20,),
               ]),
             ));
           }
@@ -120,6 +121,7 @@ class _SelectBookPageState extends State<SelectBookPage> with TickerProviderStat
                     overflow: TextOverflow.ellipsis,
                   style: TextStyle(),
                 ),
+                SizedBox(height: 20,),
               ]),
             ));
           }
@@ -183,16 +185,17 @@ class _SelectBookPageState extends State<SelectBookPage> with TickerProviderStat
                   begin: Alignment.centerLeft,
                   end: Alignment.centerRight,
                   colors: [
-                    colorScheme.color2,
-                    colorScheme.color5,
+                    colorScheme.color4,
+                    colorScheme.color4,
                   ],
                 ),
               ),
-              labelColor: Colors.brown,
+              labelColor: colorScheme.color1,
               unselectedLabelColor: Colors.black,
               controller: _tabController,
             ),
           ),
+          SizedBox(height: 20,),
           Expanded(
             child: TabBarView(
               controller: _tabController,

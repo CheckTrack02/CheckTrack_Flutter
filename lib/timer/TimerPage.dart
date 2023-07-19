@@ -137,7 +137,7 @@ class _TimerPageState extends State<TimerPage> with TickerProviderStateMixin, Wi
       ),
       body: Container(
         decoration: const BoxDecoration(
-          color: colorScheme.color1,
+          color: Colors.white,
         ),
         child: Column(
           children:[
@@ -192,7 +192,7 @@ class _TimerPageState extends State<TimerPage> with TickerProviderStateMixin, Wi
             Padding(
               padding: const EdgeInsets.only(left: 50.0, right: 50, top: 20),
               child: SizedBox(
-                height: 30.0,
+                height: 40.0,
                 width: MediaQuery.of(context).size.width,
                 child: Row(
                   children:[
@@ -255,12 +255,12 @@ class _TimerPageState extends State<TimerPage> with TickerProviderStateMixin, Wi
                     begin: Alignment.centerLeft,
                     end: Alignment.centerRight,
                     colors: [
-                      colorScheme.color2,
-                      colorScheme.color5,
+                      colorScheme.color4,
+                      colorScheme.color4,
                     ],
                   ),
                 ),
-                labelColor: Colors.brown,
+                labelColor: colorScheme.color1,
                 unselectedLabelColor: Colors.black,
                 controller: _tabController,
               ),
@@ -327,7 +327,7 @@ class _TimerPageState extends State<TimerPage> with TickerProviderStateMixin, Wi
       //print("$userName ${userTime.toString()} ${userPage.toString()} ${isInList.toString()}");
       Color userColor = colorScheme.color6;
       if(!isInList){
-        userColor = colorScheme.color3;
+        userColor = colorScheme.color5;
       }else{
         //print("USER NAME : $userName");
         userTime = value['recentUserTime'] + TimerSystem.currentDuration;
@@ -401,7 +401,7 @@ class _TimerPageState extends State<TimerPage> with TickerProviderStateMixin, Wi
       Color userColor = colorScheme.color6;
       userPage = min(bookEntity.bookPageNum, value['recentUserPage'] + (userPage * TimerSystem.currentDuration) ~/ userTime);
       userTime = value['recentUserTime'] + TimerSystem.currentDuration;
-      print(userTime.toString() + " " + userPage.toString());
+      //print(userTime.toString() + " " + userPage.toString());
       Widget widget = SizedBox(
         width : 70,
         height: 150,
@@ -416,7 +416,13 @@ class _TimerPageState extends State<TimerPage> with TickerProviderStateMixin, Wi
               userName,
               style: TextStyle(fontSize: 20, color: userColor),
             ),
-            
+            Padding(
+              padding: const EdgeInsets.only(top: 5.0, bottom: 5.0),
+              child: Text(
+                TimerSystem.timeToString(userTime),
+                style: TextStyle(fontSize: 15, color: userColor),
+              ),
+            ),
             Text(
               "$userPage pg",
               style: TextStyle(fontSize: 15, color: userColor),

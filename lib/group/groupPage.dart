@@ -32,8 +32,11 @@ class _GroupPageState extends State<GroupPage> {
       bookImageList.add(response.bookImage);
     }
     return true;
+    
   }
-
+  
+  bool isGridCreated = false;
+  List<Widget> gridBooks = [];
   @override
   Widget build(BuildContext context) {
 
@@ -42,58 +45,63 @@ class _GroupPageState extends State<GroupPage> {
         context,
         MaterialPageRoute(
           builder: (BuildContext context) => GroupAddPage(userNo: mUserNo)));
-      setState(() { });
+      setState(() { isGridCreated = false;});
     }
 
     Future<List<Widget>> makeGrid() async {
-      bool isFinished = await loadGroupList();
-      List<Widget> gridBooks = [];
+      if(!isGridCreated){
+        print("CREATING");
+        isGridCreated = true;
+        bool isFinished = await loadGroupList();
+        gridBooks = [];
 
-      void onGroupPressed(mGroup, mUserNo) async {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (BuildContext context) => GroupInfoPage(groupEntity: mGroup, userNo: mUserNo)));
-      }
-
-
-      for (int i = 0; i < groupList.length; i += 3) {
-        List<Widget> row = [];
-        for (int j = i; j < i + 3; j++) {
-          if (j >= groupList.length) {
-            row.add(SizedBox(
-              width: 100,
-            ));
-          }
-          else {
-            row.add(Column(children: [
-              GestureDetector(
-                  onTap: () {
-                    onGroupPressed(groupList[j], userNo);
-                  },
-                  child: Image(
-                    image: NetworkImage(bookImageList[j]),
-                    width: 100,
-                    height: 120,
-                  )),
-              SizedBox(
-                height: 15,
-              ),
-              Text(
-                groupList[j].groupName,
-                style: TextStyle(),
-              ),
-            ]));
-          }
+        void onGroupPressed(mGroup, mUserNo) async {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (BuildContext context) => GroupInfoPage(groupEntity: mGroup, userNo: mUserNo)));
         }
-        gridBooks.add(Padding(
-          padding: const EdgeInsets.only(top: 50),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [...row],
-          ),
-        ));
+
+
+        for (int i = 0; i < groupList.length; i += 3) {
+          List<Widget> row = [];
+          for (int j = i; j < i + 3; j++) {
+            if (j >= groupList.length) {
+              row.add(SizedBox(
+                width: 100,
+              ));
+            }
+            else {
+              row.add(Column(children: [
+                GestureDetector(
+                    onTap: () {
+                      onGroupPressed(groupList[j], userNo);
+                    },
+                    child: Image(
+                      image: NetworkImage(bookImageList[j]),
+                      width: 100,
+                      height: 120,
+                    )),
+                SizedBox(
+                  height: 15,
+                ),
+                Text(
+                  groupList[j].groupName,
+                  style: TextStyle(),
+                ),
+              ]));
+            }
+          }
+          gridBooks.add(Padding(
+            padding: const EdgeInsets.only(top: 50),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [...row],
+            ),
+          ));
+        }
       }
+      
 
       return gridBooks;
     }
@@ -104,17 +112,9 @@ class _GroupPageState extends State<GroupPage> {
       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: colorScheme.color4,
-        title: Row(
-          children: [
-            Icon(
-              Icons.people,
-            ),
-            SizedBox(
-              width: 15,
-            ),
+        title: 
             Text("READING GROUP", style: TextStyle(color: Colors.white)),
-          ],
-        )),
+          ),
       body: FutureBuilder(
         future: makeGrid(),
         builder: (BuildContext context, AsyncSnapshot snapshot){
