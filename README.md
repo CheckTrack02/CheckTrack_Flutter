@@ -45,7 +45,7 @@
 |![image](https://github.com/CheckTrack02/CheckTrack_Flutter/assets/39901387/07c08bff-f5d7-47e4-b612-fe64538dfb91)|![image](https://github.com/CheckTrack02/CheckTrack_Flutter/assets/39901387/18488730-eb9a-48b3-a1ff-6579fb9f9b5a)|
 
 #### 스탑워치 시작
-|--|--|
 |![image](https://github.com/CheckTrack02/CheckTrack_Flutter/assets/39901387/fcf19eb5-83e8-451b-9e65-cb7dccddd59d)|![image](https://github.com/CheckTrack02/CheckTrack_Flutter/assets/39901387/aa30e039-f9fd-4707-855a-84ae01b246b5)|
+|--|--|
 
 - 소켓 통신 활용
