@@ -128,8 +128,11 @@ class TimerSystem{
     if(!isTimerStart || !loadList){
       return;
     }
+    print(DateTime.now().millisecondsSinceEpoch.toString());
+    print("REMOVE " + userName + " " + userTime.toString() + " " + userPage.toString() + " " + startTime.toString());
     String removeUserName = userName;
     int removeDuration = (DateTime.now().millisecondsSinceEpoch - startTime) ~/ 1000;
+    print(TimerSystem.timeToString(userTime) + " " + removeDuration.toString());
     int removeUserTime = userTime + removeDuration;
     int removeUserPage = min(bookEntity.bookPageNum, userPage);
     if(userTime!=0){

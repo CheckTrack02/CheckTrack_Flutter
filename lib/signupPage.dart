@@ -12,11 +12,12 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  TextEditingController controller = TextEditingController();
-  TextEditingController controller2 = TextEditingController();
+  TextEditingController idController = TextEditingController();
+  TextEditingController pwController = TextEditingController();
+  TextEditingController pwController2 = TextEditingController();
 
   void onLoginPressed() async{
-    Map res = await UserAPISystem.fetchUser(controller.text, controller2.text);
+    Map res = await UserAPISystem.fetchUser(idController.text, pwController.text);
     
     if (res["statusCode"] == 200) {
       UserEntity userEntity = await APISystem.initUserEntity(res["userNo"]);
@@ -72,12 +73,12 @@ class _LoginPageState extends State<LoginPage> {
                       child: Column(
                         children: [
                           TextField(
-                          controller: controller,
+                          controller: idController,
                           decoration: InputDecoration(labelText: 'Enter id'),
                           keyboardType: TextInputType.emailAddress,
                           ),
                           TextField(
-                            controller: controller2,
+                            controller: pwController,
                             decoration: InputDecoration(labelText: 'Enter password'),
                             keyboardType: TextInputType.text,
                             obscureText: true, // 비밀번호 안보이도록 하는 것
