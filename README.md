@@ -23,7 +23,7 @@
 |--|--|
 |![KakaoTalk_Photo_2023-07-19-17-49-47 001](https://github.com/CheckTrack02/CheckTrack_Flutter/assets/36194346/9741711c-da24-48d3-80d5-5269f98cff13)|![KakaoTalk_Photo_2023-07-19-17-49-48 002](https://github.com/CheckTrack02/CheckTrack_Flutter/assets/36194346/4aea790b-5386-4e7f-ab1f-ee94da030b79)|
 
-- 화면 전환
+#### 화면 전환
 ![KakaoTalk_20230719_174923613_02](https://github.com/CheckTrack02/CheckTrack_Flutter/assets/39901387/28c5aec4-8d1c-4b55-b92e-63334014d0b8)
 
 
